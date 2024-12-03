@@ -17,11 +17,13 @@ def matrix_transpose(matrix):
     """
     Calculate the transpose of a matrix.
 
-    The function returns a new matrix that is the transpose of the input matrix,
+    The function returns a new matrix that is the transpose
+    of the input matrix,
     meaning its rows are converted to columns.
 
     Args:
-        matrix (list of lists): A 2D list representing the matrix to be transposed.
+        matrix (list of lists): A 2D list representing
+        the matrix to be transposed.
 
     Returns:
         list of lists: A new 2D list representing the transposed matrix.
