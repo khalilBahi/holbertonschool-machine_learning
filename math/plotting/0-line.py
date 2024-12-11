@@ -12,7 +12,7 @@ Functions:
 Modules:
     - numpy: Used for efficient numerical operations.
     - matplotlib.pyplot: Used for creating static,
-    animated, and interactive visualizations.
+      animated, and interactive visualizations.
 """
 
 import numpy as np
@@ -38,9 +38,6 @@ def line():
     Example:
     >>> line()  # This will display the cubic plot.
     """
-
-
-def line():
     y = np.arange(0, 11) ** 3
     plt.figure(figsize=(6.4, 4.8))
 
