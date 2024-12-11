@@ -64,7 +64,7 @@ def change_scale():
     y = np.exp((r / t) * x)
 
     # Set up the figure for plotting
-    plt.figure(figsize=(6.4, 4.8))
+    plt.figure(figsize=(8, 6))
 
     # Plot the decay curve with a blue solid line
     plt.plot(x, y, "b-")  # Blue solid line for C-14
@@ -81,6 +81,9 @@ def change_scale():
 
     # Set the range for the x-axis
     plt.xlim(0, 28650)  # Time range: 0 to 28,650 years
+
+    # Add gridlines to match the reference plot appearance
+    plt.grid(True)
 
     # Show the plot
     plt.show()
