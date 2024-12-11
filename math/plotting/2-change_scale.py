@@ -57,7 +57,7 @@ def change_scale():
     y = np.exp((r / t) * x)
     plt.figure(figsize=(6.4, 4.8))
 
-    plt.plot(x, y, color='#187bcd', linestyle='-')
+    plt.plot(x, y)
 
     # Labeling the x-axis and y-axis
     plt.xlabel('Time (years)')
