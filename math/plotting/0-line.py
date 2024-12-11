@@ -33,6 +33,9 @@ def line():
     Note:
     - The legend functionality is included but not
     functional because no label is provided to the plot.
+
+    Example:
+    >>> line()  # This will display the cubic plot.
     """
 
 
