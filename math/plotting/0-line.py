@@ -12,7 +12,7 @@ Functions:
 Modules:
     - numpy: Used for efficient numerical operations.
     - matplotlib.pyplot: Used for creating static,
-      animated, and interactive visualizations.
+    animated, and interactive visualizations.
 """
 
 import numpy as np
@@ -30,9 +30,10 @@ def line():
     4. Sets the x-axis range to [0, 10].
     5. Displays the plot.
 
-    Note:
-    - The legend functionality is included but not
-    functional because no label is provided to the plot.
+    Details:
+    - The plot uses a solid red line ('r-') to represent the cubic function.
+    - The x-axis is restricted to the range [0, 10] for clarity.
+    - A legend can be added if a label is provided to the plot.
 
     Example:
     >>> line()  # This will display the cubic plot.
