@@ -82,8 +82,5 @@ def change_scale():
     # Set the range for the x-axis
     plt.xlim(0, 28650)  # Time range: 0 to 28,650 years
 
-    # Display the legend (empty in this case since no label is given)
-    plt.legend()
-
     # Show the plot
     plt.show()
