@@ -47,5 +47,4 @@ def line():
     plt.xlim(0, 10)
 
     # Show the plot
-    plt.legend()
     plt.show()
