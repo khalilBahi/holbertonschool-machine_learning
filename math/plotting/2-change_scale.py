@@ -51,27 +51,36 @@ def change_scale():
     plot with a logarithmic y-axis.
     """
 
+    # Time range from 0 to 28,650 years, in steps of 5730 years (half-life of C-14)
     x = np.arange(0, 28651, 5730)
+
+    # Decay constant (logarithmic of 0.5, representing the half-life decay)
     r = np.log(0.5)
-    t = 5730
+
+    # Half-life of C-14 in years
+    t = 5730  # C-14 half-life
+
+    # Calculate the fraction remaining for C-14 using the exponential decay formula
     y = np.exp((r / t) * x)
+
+    # Set up the figure for plotting
     plt.figure(figsize=(6.4, 4.8))
-    
+
     # Plot the decay curve with a blue solid line
-    plt.plot(x, y, "b-")  # Blue solid line for C-14
+    plt.plot(x, y, 'b-')
 
     # Labeling the x-axis and y-axis
-    plt.xlabel("Time (years)")
-    plt.ylabel("Fraction Remaining")
+    plt.xlabel('Time (years)')
+    plt.ylabel('Fraction Remaining')
 
     # Adding the title to the plot
-    plt.title("Exponential Decay of C-14")
+    plt.title('Exponential Decay of C-14')
 
     # Set logarithmic scaling for the y-axis
-    plt.yscale("log")
+    plt.yscale('log')
 
-    # Set the range for the x-axis
-    plt.xlim(0, 28650)  # Time range: 0 to 28,650 years
+    # Set the range for the x-axis from 0 to 28,650 years
+    plt.xlim(0, 28650)
 
     # Show the plot
     plt.show()
