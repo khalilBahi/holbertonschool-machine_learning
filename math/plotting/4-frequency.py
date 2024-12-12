@@ -19,7 +19,7 @@ def frequency():
     student_grades = np.random.normal(68, 15, 50)
     plt.figure(figsize=(6.4, 4.8))
 
-    bins = range(0, 101, 10)  # Bins every 10 units from 0 to 100
+    bins=np.arange(0, 110, 10)  # Bins every 10 units from 0 to 100
     plt.hist(student_grades, bins=bins, edgecolor="black")
 
     plt.xlim(0, 100)
