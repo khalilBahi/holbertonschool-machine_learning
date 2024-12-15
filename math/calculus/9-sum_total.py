@@ -4,6 +4,7 @@ we make every day, and those decisions are determined by our priorities"""
 
 import numpy as np
 
+
 def summation_i_squared(n):
     """
     Calculate the sum of squares of integers from 1 to n.
@@ -18,6 +19,5 @@ def summation_i_squared(n):
     if not isinstance(n, int) or n < 1:
         return None
 
-    Sum = sum(np.square(np.arange(1, n+1)))
+    Sum = sum(np.square(np.arange(1, n + 1)))
     return Sum
-
