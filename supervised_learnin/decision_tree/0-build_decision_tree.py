@@ -162,7 +162,7 @@ class Decision_Tree():
         split_criterion : str, optional
             The criterion used to split nodes (default is "random").
         root : Node or None, optional
-            The root node of the tree (default is None).
+            The root node of the tree (default is None)
         """
         self.rng = np.random.default_rng(seed)
         if root:
