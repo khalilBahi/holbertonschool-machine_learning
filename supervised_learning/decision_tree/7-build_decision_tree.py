@@ -44,7 +44,7 @@ def right_child_add_prefix(text):
 
 class Node:
     """
-    A class representing a node in a decision tree.
+    A class representing a node in a decision tree
 
     Attributes:
     feature : int or None
@@ -129,154 +129,41 @@ class Node:
         int
             The number of nodes in the subtree.
         """
+        if self.is_leaf:
+            return 1
+        left_count = self.left_child.count_nodes_below(
+            only_leaves) if self.left_child else 0
+        right_count = self.right_child.count_nodes_below(
+            only_leaves) if self.right_child else 0
         if only_leaves:
-            # Count leaves in both children
-            return (
-                self.left_child.count_nodes_below(only_leaves=True) +
-                self.right_child.count_nodes_below(only_leaves=True)
-            )
+            return left_count + right_count
         else:
-            # Count all nodes in the subtree
-            return (
-                1 + self.left_child.count_nodes_below(only_leaves=False) +
-                self.right_child.count_nodes_below(only_leaves=False)
-            )
+            return 1 + left_count + right_count
 
     def __str__(self):
         """
-        Provides a string representation of the node, including its children.
+        Returns a string representation of the node and its children.
 
         Returns:
         str
-            A formatted string representing the subtree rooted at this node.
+            The string representation of the node.
         """
         if self.is_root:
-            result = (
-                f"root [feature={self.feature}, threshold={self.threshold}]\n"
-            )
+            Type = "root "
+        elif self.is_leaf:
+            return f"-> leaf [value={self.value}]"
         else:
-            result = (
-                f"node [feature={self.feature}, threshold={self.threshold}]\n"
-            )
-
-        # Add left child with prefix
+            Type = "-> node "
         if self.left_child:
-            left_str = self.left_child.__str__()
-            result += left_child_add_prefix(left_str)
-
-        # Add right child with prefix
-        if self.right_child:
-            right_str = self.right_child.__str__()
-            result += right_child_add_prefix(right_str)
-
-        return result
-
-    def get_leaves_below(self):
-        """
-        Returns the list of all leaf nodes in the subtree rooted at this node.
-
-        Returns:
-        list
-            A list of all leaves in the subtree.
-        """
-        leaves = []
-        if self.left_child:
-            leaves.extend(self.left_child.get_leaves_below())
-        if self.right_child:
-            leaves.extend(self.right_child.get_leaves_below())
-        return leaves
-
-    def update_bounds_below(self):
-        """
-        Recursively computes and updates the lower
-        and upper bounds dictionaries
-        for each node and its children based on the feature thresholds.
-        """
-        if self.is_root:
-            # Initialize bounds at the root
-            self.upper = {0: np.inf}
-            self.lower = {0: -np.inf}
-
-        # Compute bounds for children
-        if self.left_child:
-            self.left_child.lower = self.lower.copy()
-            self.left_child.upper = self.upper.copy()
-            # Update upper bound for the feature
-            self.left_child.lower[self.feature] = self.threshold
-
-        if self.right_child:
-            self.right_child.lower = self.lower.copy()
-            self.right_child.upper = self.upper.copy()
-            # Update lower bound for the feature
-            self.right_child.upper[self.feature] = self.threshold
-
-        # Recursively update bounds for children
-        for child in [self.left_child, self.right_child]:
-            if child:
-                child.update_bounds_below()
-
-    def update_indicator(self):
-        """
-        Compute the indicator function for the current
-        node based on the lower and upper bounds.
-        """
-
-        def is_large_enough(x):
-            """
-            Check if each individual has all its features
-            greater than the lower bounds.
-
-            Parameters:
-            x : np.ndarray
-                A 2D NumPy array of shape (n_individuals, n_features).
-
-            Returns:
-
-            np.ndarray
-                A 1D NumPy array of boolean values
-                indicating if each individual meets the condition.
-            """
-            return np.all(np.array([x[:, key] > self.lower[key]
-                                    for key in self.lower.keys()]), axis=0)
-
-        def is_small_enough(x):
-            """
-            Check if each individual has all its features
-            less than or equal to the upper bounds.
-
-            Parameters:
-            x : np.ndarray
-                A 2D NumPy array of shape (n_individuals, n_features).
-
-            Returns:
-            np.ndarray
-                A 1D NumPy array of boolean values indicating
-                if each individual meets the condition.
-            """
-            return np.all(np.array([x[:, key] <= self.upper[key]
-                                    for key in self.upper.keys()]), axis=0)
-
-        self.indicator = lambda x: \
-            np.all(np.array([is_large_enough(x), is_small_enough(x)]), axis=0)
-
-    def pred(self, x):
-        """
-        Predict the class for a single individual at the node.
-
-        Parameters:
-        x : np.ndarray
-            A 1D NumPy array representing the features of a single individual.
-
-        Returns:
-        int
-            The predicted class for the individual.
-        """
-        if self.is_leaf:
-            return self.value
-        if x[self.feature] > self.threshold:
-            return self.left_child.pred(x)
+            left_str = left_child_add_prefix(str(self.left_child))
         else:
-            return self.right_child.pred(x)
+            left_str = ""
+        if self.right_child:
+            right_str = right_child_add_prefix(str(self.right_child))
+        else:
+            right_str = ""
+        return (f"{Type}[feature={self.feature}, threshold={self.threshold}]\n"
+                f"{left_str}{right_str}").rstrip()
 
 
 class Leaf(Node):
@@ -341,48 +228,10 @@ class Leaf(Node):
         str
             The string representation of the leaf node.
         """
-        return f"-> leaf [value={self.value}]"
-
-    def get_leaves_below(self):
-        """
-        Returns the list of all leaf nodes in the subtree rooted at this leaf.
-
-        Returns:
-        list
-            A list containing this leaf.
-        """
-        return [self]
-
-    def update_bounds_below(self):
-        """
-        Leaf nodes inherit bounds from their
-        parent nodes and do not propagate further.
-        """
-        # Bounds are inherited from the parent node and remain unchanged
-        pass
-
-    def get_leaves_below(self):
-        """
-        Returns the leaf node itself in a list.
-        """
-        return [self]
-
-    def pred(self, x):
-        """
-        Predict the class for a single individual at the leaf node.
-
-        Parameters:
-        x : np.ndarray
-            A 1D NumPy array representing the features of a single individual.
-
-        Returns:
-        int
-            The predicted class for the individual.
-        """
-        return self.value
+        return (f"-> leaf [value={self.value}]")
 
 
-class Decision_Tree():
+class Decision_Tree:
     """
     A class representing a decision tree.
 
