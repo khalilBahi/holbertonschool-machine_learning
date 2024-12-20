@@ -583,7 +583,6 @@ class Decision_Tree():
             print(f"    - Accuracy on training data : "
                   f"{self.accuracy(self.explanatory, self.target)}")
 
-
     def np_extrema(self, arr):
         """
         Returns the minimum and maximum values of the array.
