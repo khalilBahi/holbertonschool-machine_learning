@@ -17,9 +17,9 @@ def left_child_add_prefix(text):
         The text with the left child prefix added to each line.
     """
     lines = text.split("\n")
-    new_text = "    +--" + lines[0] + "\n"
+    new_text = "    +---> " + lines[0] + "\n"
     for x in lines[1:]:
-        new_text += ("    |  " + x) + "\n"
+        new_text += ("    |      " + x) + "\n"
     return new_text
 
 
@@ -36,14 +36,14 @@ def right_child_add_prefix(text):
         The text with the right child prefix added to each line.
     """
     lines = text.split("\n")
-    new_text = "    +--" + lines[0] + "\n"        
+    new_text = "    +---> " + lines[0] + "\n"        
     for x in lines[1:]:
-        new_text += ("       " + x) + "\n"
+        new_text += ("           " + x) + "\n"
     return new_text
 
 class Node:
     """
-    A class representing a node in a decision tree.
+    A class representing a node in a decision tree
 
     Attributes:
     feature : int or None
