@@ -129,16 +129,14 @@ class Node:
         int
             The number of nodes in the subtree.
         """
+        if self.is_leaf:
+            return 1
+        left_count = self.left_child.count_nodes_below(only_leaves) if self.left_child else 0
+        right_count = self.right_child.count_nodes_below(only_leaves) if self.right_child else 0
         if only_leaves:
-            # Count leaves in both children
-            return self.left_child.count_nodes_below(
-                only_leaves=True) + self.right_child.count_nodes_below(
-                    only_leaves=True)
+            return left_count + right_count
         else:
-            # Count all nodes in the subtree
-            return 1 + self.left_child.count_nodes_below(
-                only_leaves=False) + self.right_child.count_nodes_below(
-                    only_leaves=False)
+            return 1 + left_count + right_count
 
     def __str__(self):
         """
@@ -235,7 +233,7 @@ class Leaf(Node):
         return (f"-> leaf [value={self.value}]")
 
 
-class Decision_Tree():
+class Decision_Tree:
     """
     A class representing a decision tree.
 
