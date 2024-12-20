@@ -320,4 +320,4 @@ class Decision_Tree:
         str
             The string representation of the decision tree.
         """
-        return self.root.__str__() + "\n"
+        return self.root.__str__()
