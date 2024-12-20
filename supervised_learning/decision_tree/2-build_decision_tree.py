@@ -2,6 +2,45 @@
 """ Task 1: 1. Number of nodes/leaves in a decision tree"""
 import numpy as np
 
+def left_child_add_prefix(text):
+    """
+    Adds a prefix to each line of the text to
+    indicate it is the left child in the tree structure.
+
+    Parameters:
+    text : str
+        The text to which the prefix will be added.
+
+    Returns:
+    str
+        The text with the left child prefix added to each line.
+    """
+    lines = text.split("\n")
+    new_text = "    +--" + lines[0] + "\n"
+    for x in lines[1:]:
+        new_text += ("    |  "+x) + "\n"
+    return new_text
+
+
+def right_child_add_prefix(text):
+    """
+    Adds a prefix to each line of the text to indicate
+    it is the right child in the tree structure.
+
+    Parameters:
+    text : str
+        The text to which the prefix will be added.
+
+    Returns:
+    str
+        The text with the right child prefix added to each line.
+    """
+    lines = text.split("\n")
+    new_text = "    +--" + lines[0] + "\n"
+    for x in lines[1:]:
+        new_text += ("       " + x) + "\n"
+    return new_text
+
 class Node:
     """
     A class representing a node in a decision tree
@@ -98,40 +137,29 @@ class Node:
         else:
             return 1 + left_count + right_count
 
-    def left_child_add_prefix(self, text):
-        """Add the appropriate prefix for the left child."""
-        lines = text.split("\n")
-        new_text = "    +--" + lines[0] + "\n"
-        for x in lines[1:]:
-            new_text += "    |  " + x + "\n"
-        return new_text
-
-    def right_child_add_prefix(self, text):
-        """Add the appropriate prefix for the right child."""
-        lines = text.split("\n")
-        new_text = "    +--" + lines[0] + "\n"
-        for x in lines[1:]:
-            new_text += "       " + x + "\n"
-        return new_text
-
     def __str__(self):
         """
-        Provides a string representation of the node, including its children.
+        Returns a string representation of the node and its children.
 
         Returns:
         str
-            A formatted string representing the subtree rooted at this node.
+            The string representation of the node.
         """
-        if self.left_child is None and self.right_child is None:
+        if self.is_root:
+            Type = "root "
+        elif self.is_leaf:
             return f"-> leaf [value={self.value}]"
-        
-        left_str = self.left_child.__str__()
-        right_str = self.right_child.__str__()
-        
-        left_str = self.left_child_add_prefix(left_str)
-        right_str = self.right_child_add_prefix(right_str)
-
-        return f"root [feature={self.feature}, threshold={self.threshold}]\n{left_str}{right_str}"
+        else:
+            Type = "-> node "
+        if self.left_child:
+            left_str = left_child_add_prefix(str(self.left_child))
+        else:
+            left_str = ""
+        if self.right_child:
+            right_str = right_child_add_prefix(str(self.right_child))
+        else:
+            right_str = ""
+        return f"{Type}[feature={self.feature}, threshold={self.threshold}]\n{left_str}{right_str}".rstrip()
 
 
 class Leaf(Node):
@@ -287,4 +315,4 @@ class Decision_Tree:
         str
             The string representation of the decision tree.
         """
-        return self.root.__str__()
+        return self.root.__str__() + "\n"
