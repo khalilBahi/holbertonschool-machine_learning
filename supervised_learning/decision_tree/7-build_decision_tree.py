@@ -567,27 +567,22 @@ class Decision_Tree():
         else:
             self.split_criterion = self.Gini_split_criterion
 
-        # Assign explanatory and target to the tree
         self.explanatory = explanatory
         self.target = target
+        self.root.sub_population = np.ones_like(self.target, dtype='bool')
 
-        # Initialize the root node
-        self.root.sub_population = np.ones_like(self.target, dtype=bool)
+        self.fit_node(self.root)
 
-        # Fit the tree starting from the root node
-        self.fit_node(self.root)  # To be implemented as per earlier tasks
+        self.update_predict()
 
-        # Update the predict function
-        self.update_predict()  # To be defined in a previous task
-
-        # Verbose output
         if verbose == 1:
             print(f"""  Training finished.
-- Depth                     : {self.depth()}
-- Number of nodes           : {self.count_nodes()}
-- Number of leaves          : {self.count_nodes(only_leaves=True)}
-- Accuracy on training data : {self.accuracy(self.explanatory, self.target)
-}""")
+    - Depth                     : {self.depth()}
+    - Number of nodes           : {self.count_nodes()}
+    - Number of leaves          : {self.count_nodes(only_leaves=True)}""")
+            print(f"    - Accuracy on training data : "
+                  f"{self.accuracy(self.explanatory, self.target)}")
+
 
     def np_extrema(self, arr):
         """
