@@ -2,45 +2,6 @@
 """ Task 1: 1. Number of nodes/leaves in a decision tree"""
 import numpy as np
 
-
-def left_child_add_prefix(text):
-    """
-    Adds a prefix to each line of the text to
-    indicate it is the left child in the tree structure.
-
-    Parameters:
-    text : str
-        The text to which the prefix will be added.
-
-    Returns:
-    str
-        The text with the left child prefix added to each line.
-    """
-    lines = text.split("\n")
-    new_text = "    +--" + lines[0] + "\n"
-    for x in lines[1:]:
-        new_text += ("    |  "+x) + "\n"
-    return new_text
-
-
-def right_child_add_prefix(text):
-    """
-    Adds a prefix to each line of the text to indicate
-    it is the right child in the tree structure.
-
-    Parameters:
-    text : str
-    The text to which the prefix will be added.
-    Returns:
-    str
-        The text with the right child prefix added to each line.
-    """
-    lines = text.split("\n")
-    new_text = "    +--" + lines[0] + "\n"
-    for x in lines[1:]:
-        new_text += ("       " + x) + "\n"
-    return new_text
-
 class Node:
     """
     A class representing a node in a decision tree
@@ -137,6 +98,22 @@ class Node:
         else:
             return 1 + left_count + right_count
 
+    def left_child_add_prefix(self, text):
+        """Add the appropriate prefix for the left child."""
+        lines = text.split("\n")
+        new_text = "    +--" + lines[0] + "\n"
+        for x in lines[1:]:
+            new_text += "    |  " + x + "\n"
+        return new_text
+
+    def right_child_add_prefix(self, text):
+        """Add the appropriate prefix for the right child."""
+        lines = text.split("\n")
+        new_text = "    +--" + lines[0] + "\n"
+        for x in lines[1:]:
+            new_text += "       " + x + "\n"
+        return new_text
+
     def __str__(self):
         """
         Provides a string representation of the node, including its children.
@@ -157,12 +134,12 @@ class Node:
         # Add left child with prefix
         if self.left_child:
             left_str = self.left_child.__str__()
-            result += left_child_add_prefix(left_str)
+            result += self.left_child_add_prefix(left_str)
 
         # Add right child with prefix
         if self.right_child:
             right_str = self.right_child.__str__()
-            result += right_child_add_prefix(right_str)
+            result += self.right_child_add_prefix(right_str)
 
         return result
 
