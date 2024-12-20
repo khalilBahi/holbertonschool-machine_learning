@@ -122,26 +122,16 @@ class Node:
         str
             A formatted string representing the subtree rooted at this node.
         """
-        if self.is_root:
-            result = (
-                f"root [feature={self.feature}, threshold={self.threshold}]\n"
-            )
-        else:
-            result = (
-                f"node [feature={self.feature}, threshold={self.threshold}]\n"
-            )
+        if self.left_child is None and self.right_child is None:
+            return f"-> leaf [value={self.value}]"
+        
+        left_str = self.left_child.__str__()
+        right_str = self.right_child.__str__()
+        
+        left_str = self.left_child_add_prefix(left_str)
+        right_str = self.right_child_add_prefix(right_str)
 
-        # Add left child with prefix
-        if self.left_child:
-            left_str = self.left_child.__str__()
-            result += self.left_child_add_prefix(left_str)
-
-        # Add right child with prefix
-        if self.right_child:
-            right_str = self.right_child.__str__()
-            result += self.right_child_add_prefix(right_str)
-
-        return result
+        return f"root [feature={self.feature}, threshold={self.threshold}]\n{left_str}{right_str}"
 
 
 class Leaf(Node):
