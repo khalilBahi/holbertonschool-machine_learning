@@ -5,6 +5,32 @@ Decision_Tree = __import__('8-build_decision_tree').Decision_Tree
 
 
 class Random_Forest:
+    """
+    A Random Forest classifier that aggregates predictions
+    from multiple decision trees.
+
+    Parameters:
+    ----------
+    n_trees : int, optional
+        The number of trees in the forest. Default is 100.
+    max_depth : int, optional
+        The maximum depth of each tree. Default is 10.
+    min_pop : int, optional
+        The minimum population (number of samples) required
+        to split a node. Default is 1.
+    seed : int, optional
+        The random seed for reproducibility. Default is 0.
+
+    Attributes:
+    ----------
+    numpy_preds : list
+        A list of trained decision trees in the forest.
+    target : array-like
+        The target values used for training.
+    explanatory : array-like
+        The input features used for training.
+    """
+
     def __init__(self, n_trees=100, max_depth=10, min_pop=1, seed=0):
         """
         Initializes the Isolation Random Tree with the specified parameters.
