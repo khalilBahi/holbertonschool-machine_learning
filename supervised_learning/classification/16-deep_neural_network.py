@@ -5,7 +5,8 @@ import numpy as np
 
 class DeepNeuralNetwork:
     """
-    Defines a deep neural network performing binary classification.
+    Defines a deep neural network
+    performing binary classification.
     """
 
     def __init__(self, nx, layers):
