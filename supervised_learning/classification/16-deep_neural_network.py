@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+""" Task 16: 16. DeepNeuralNetwork"""
+import numpy as np
+
+
+class DeepNeuralNetwork:
+    """
+    Defines a deep neural network performing binary classification.
+    """
+
+    def __init__(self, nx, layers):
+        """
+        Constructor for DeepNeuralNetwork.
+
+        Parameters:
+        - nx: Number of input features.
+        - layers: List representing the number of nodes in each layer.
+
+        Raises:
+        - TypeError: If nx is not an integer or
+        layers is not a list of positive integers.
+        - ValueError: If nx is less than 1.
+        """
+        if not isinstance(nx, int):
+            raise TypeError("nx must be an integer")
+        if nx < 1:
+            raise ValueError("nx must be a positive integer")
+        if not isinstance(layers, list) or len(layers) == 0:
+            raise TypeError("layers must be a list of positive integers")
+        if not all(isinstance(layer, int) and layer > 0 for layer in layers):
+            raise TypeError("layers must be a list of positive integers")
+
+        self.L = len(layers)
+        self.cache = {}
+        self.weights = {}
+
+        for i in range(self.L):
+            layer_input = nx if i == 0 else layers[i - 1]
+            self.weights[f"W{i + 1}"] = np.random.randn(
+                layers[i], layer_input
+            ) * np.sqrt(2 / layer_input)
+            self.weights[f"b{i + 1}"] = np.zeros((layers[i], 1))
