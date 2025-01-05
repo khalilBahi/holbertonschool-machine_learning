@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-""" Task 16: 16. DeepNeuralNetwork"""
+""" Task 16: 16. DeepNeuralNetwork """
 import numpy as np
 
 
 class DeepNeuralNetwork:
     """
-    Defines a deep neural network
-    performing binary classification.
+    Defines a deep neural network performing binary classification.
     """
 
     def __init__(self, nx, layers):
@@ -19,7 +18,7 @@ class DeepNeuralNetwork:
 
         Raises:
         - TypeError: If nx is not an integer or
-        layers is not a list of positive integers.
+          layers is not a list of positive integers.
         - ValueError: If nx is less than 1.
         """
         if not isinstance(nx, int):
@@ -35,9 +34,12 @@ class DeepNeuralNetwork:
         self.cache = {}
         self.weights = {}
 
-        for i in range(self.L):
-            layer_input = nx if i == 0 else layers[i - 1]
-            self.weights[f"W{i + 1}"] = np.random.randn(
-                layers[i], layer_input
-            ) * np.sqrt(2 / layer_input)
-            self.weights[f"b{i + 1}"] = np.zeros((layers[i], 1))
+        # Combine into a single loop
+        prev_nodes = nx
+        for i, nodes in enumerate(layers):
+            self.weights[f"W{i + 1}"
+                         ] = np.random.randn(nodes, prev_nodes) * np.sqrt(
+                2 / prev_nodes
+            )
+            self.weights[f"b{i + 1}"] = np.zeros((nodes, 1))
+            prev_nodes = nodes
