@@ -20,8 +20,7 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes,
         X_valid: numpy.ndarray, validation input data.
         Y_valid: numpy.ndarray, validation labels.
         layer_sizes: list of int, number of nodes in each layer of the network.
-        activations: list of activation functions
-        for each layer of the network.
+        activations: list of activation functionsfor each layer of the network
         alpha: float, the learning rate.
         iterations: int, the number of iterations to train over.
         save_path: str, path to save the trained model.
@@ -29,11 +28,18 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes,
     Returns:
         str: The path where the model was saved.
     """
+    # Create placeholders for input and labels
     x, y = create_placeholders(X_train.shape[1], Y_train.shape[1])
+
+    # Define forward propagation
     y_pred = forward_prop(x, layer_sizes, activations)
+
+    # Define loss and accuracy
     loss = calculate_loss(y, y_pred)
     accuracy = calculate_accuracy(y, y_pred)
-    train_op = create_train_op(loss, alpha)
+
+    # Use Adam optimizer (more stable for training)
+    optimizer = tf.train.AdamOptimizer(learning_rate=alpha).minimize(loss)
 
     # Add tensors and operations to the graph's collection
     tf.add_to_collection("x", x)
@@ -41,17 +47,23 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes,
     tf.add_to_collection("y_pred", y_pred)
     tf.add_to_collection("loss", loss)
     tf.add_to_collection("accuracy", accuracy)
-    tf.add_to_collection("train_op", train_op)
+    tf.add_to_collection("optimizer", optimizer)
 
+    # Initialize variables
     init = tf.global_variables_initializer()
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
+        # Initialize the variables
         sess.run(init)
+
         for i in range(iterations + 1):
+            # Create feed dictionaries
             feed_train = {x: X_train, y: Y_train}
             feed_valid = {x: X_valid, y: Y_valid}
 
+            # Every 100 iterations or the final iteration, print the cost and
+            # accuracy
             if i % 100 == 0 or i == iterations:
                 train_cost, train_accuracy = sess.run(
                     [loss, accuracy], feed_dict=feed_train)
@@ -63,8 +75,10 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes,
                 print(f"\tValidation Cost: {valid_cost}")
                 print(f"\tValidation Accuracy: {valid_accuracy}")
 
-            sess.run(train_op, feed_dict=feed_train)
+            # Perform one step of gradient descent
+            sess.run(optimizer, feed_dict=feed_train)
 
+        # Save the trained model
         save_path = saver.save(sess, save_path)
 
     return save_path
