@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """ Task 6: 6. Train """
-import numpy as np
+
 import tensorflow.compat.v1 as tf  # type: ignore
 tf.disable_eager_execution()
 
