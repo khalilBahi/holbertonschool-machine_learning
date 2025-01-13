@@ -28,43 +28,45 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes,
     Returns:
         str: The path where the model was saved.
     """
+    tf.reset_default_graph()
+
     x, y = create_placeholders(X_train.shape[1], Y_train.shape[1])
     y_pred = forward_prop(x, layer_sizes, activations)
     loss = calculate_loss(y, y_pred)
     accuracy = calculate_accuracy(y, y_pred)
     train_op = create_train_op(loss, alpha)
 
-    # Add tensors and operations to the graph's collection
-    tf.add_to_collection("x", x)
-    tf.add_to_collection("y", y)
-    tf.add_to_collection("y_pred", y_pred)
-    tf.add_to_collection("loss", loss)
-    tf.add_to_collection("accuracy", accuracy)
-    tf.add_to_collection("train_op", train_op)
+    tf.add_to_collection('x', x)
+    tf.add_to_collection('y', y)
+    tf.add_to_collection('y_pred', y_pred)
+    tf.add_to_collection('loss', loss)
+    tf.add_to_collection('accuracy', accuracy)
+    tf.add_to_collection('train_op', train_op)
 
     init = tf.global_variables_initializer()
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
         sess.run(init)
+
         for i in range(iterations + 1):
-            feed_train = {x: X_train, y: Y_train}
-            feed_valid = {x: X_valid, y: Y_valid}
+            train_feed = {x: X_train, y: Y_train}
+            valid_feed = {x: X_valid, y: Y_valid}
 
             if i % 100 == 0 or i == iterations:
                 train_cost, train_accuracy = sess.run(
-                    [loss, accuracy], feed_dict=feed_train)
+                    [loss, accuracy], feed_dict=train_feed)
                 valid_cost, valid_accuracy = sess.run(
-                    [loss, accuracy], feed_dict=feed_valid)
+                    [loss, accuracy], feed_dict=valid_feed)
+
                 print(f"After {i} iterations:")
                 print(f"\tTraining Cost: {train_cost}")
                 print(f"\tTraining Accuracy: {train_accuracy}")
                 print(f"\tValidation Cost: {valid_cost}")
                 print(f"\tValidation Accuracy: {valid_accuracy}")
 
-            sess.run(train_op, feed_dict=feed_train)
+            sess.run(train_op, feed_dict=train_feed)
 
         save_path = saver.save(sess, save_path)
-        print(f"Model saved in path: {save_path}")
 
     return save_path
