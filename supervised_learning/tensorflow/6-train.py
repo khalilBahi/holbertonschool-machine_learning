@@ -65,5 +65,6 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes,
             sess.run(train_op, feed_dict=feed_train)
 
         save_path = saver.save(sess, save_path)
+        print(f"Model saved in path: {save_path}")
 
     return save_path
