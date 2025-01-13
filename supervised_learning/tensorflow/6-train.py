@@ -30,59 +30,32 @@ def train(X_train, Y_train, X_valid, Y_valid, layer_sizes,
     Returns:
         str: The path where the model was saved.
     """
-    tf.reset_default_graph()
-
-    # Create placeholders for inputs and labels
     x, y = create_placeholders(X_train.shape[1], Y_train.shape[1])
-
-    # Build the forward propagation graph
-    y_pred = forward_prop(x, layer_sizes, activations)
-
-    # Define loss and accuracy
-    loss = calculate_loss(y, y_pred)
-    accuracy = calculate_accuracy(y, y_pred)
-
-    # Define the training operation
-    train_op = create_train_op(loss, alpha)
-
-    # Add tensors and operations to the graph's collection for saving
     tf.add_to_collection('x', x)
     tf.add_to_collection('y', y)
+    y_pred = forward_prop(x, layer_sizes, activations)
     tf.add_to_collection('y_pred', y_pred)
+    loss = calculate_loss(y, y_pred)
     tf.add_to_collection('loss', loss)
+    accuracy = calculate_accuracy(y, y_pred)
     tf.add_to_collection('accuracy', accuracy)
+    train_op = create_train_op(loss, alpha)
     tf.add_to_collection('train_op', train_op)
-
-    # Initialize variables
     init = tf.global_variables_initializer()
-
-    # Create a saver for saving the model
     saver = tf.train.Saver()
-
-    with tf.Session() as sess:
-        sess.run(init)  # Initialize all variables
-
-        for i in range(iterations + 1):
-            train_feed = {x: X_train, y: Y_train}
-            valid_feed = {x: X_valid, y: Y_valid}
-
-            # Print progress every 100 iterations, at the start, and at the end
-            if i % 100 == 0 or i == iterations:
-                train_cost, train_accuracy = sess.run(
-                    [loss, accuracy], feed_dict=train_feed)
-                valid_cost, valid_accuracy = sess.run(
-                    [loss, accuracy], feed_dict=valid_feed)
-
-                print(f"After {i} iterations:")
-                print(f"\tTraining Cost: {train_cost}")
-                print(f"\tTraining Accuracy: {train_accuracy}")
-                print(f"\tValidation Cost: {valid_cost}")
-                print(f"\tValidation Accuracy: {valid_accuracy}")
-
-            # Perform a training step
-            sess.run(train_op, feed_dict=train_feed)
-
-        # Save the trained model
-        save_path = saver.save(sess, save_path)
-
-    return save_path
+    sess = tf.Session()
+    sess.run(init)
+    for step in range(iterations + 1):
+        t_cost = sess.run(loss, feed_dict={x: X_train, y: Y_train})
+        t_acc = sess.run(accuracy, feed_dict={x: X_train, y: Y_train})
+        v_cost = sess.run(loss, feed_dict={x: X_valid, y: Y_valid})
+        v_acc = sess.run(accuracy, feed_dict={x: X_valid, y: Y_valid})
+        if step % 100 == 0 or step == iterations:
+            print("After {} iterations:".format(step))
+            print("\tTraining Cost: {}".format(t_cost))
+            print("\tTraining Accuracy: {}".format(t_acc))
+            print("\tValidation Cost: {}".format(v_cost))
+            print("\tValidation Accuracy: {}".format(v_acc))
+        if step < iterations:
+            sess.run(train_op, feed_dict={x: X_train, y: Y_train})
+    return saver.save(sess, save_path)
