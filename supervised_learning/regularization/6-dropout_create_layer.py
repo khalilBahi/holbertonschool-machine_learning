@@ -10,17 +10,25 @@ def dropout_create_layer(prev, n, activation, keep_prob, training=True):
     Parameters:
     prev -- tensor containing the output of the previous layer
     n -- number of nodes the new layer should contain
-    activation -- activation function that should be used on the layer
-    keep_prob -- probability that a node will be kept
-    training -- boolean to determine if the model is training
+    activation -- activation function for the new layer
+    keep_prob -- probability that a node will be kept (1 - dropout rate)
+    training -- boolean indicating whether the model is in training mode
 
     Returns:
-    output -- the output of the new layer
+    output -- the output tensor of the new layer
     """
-    # Create a layer with the given parameters
-    layer = tf.keras.layers.Dense(units=n, activation=activation,
-                                  kernel_initializer='he_normal')
-    # Apply dropout to the layer
-    dropout = tf.keras.layers.Dropout(rate=1 - keep_prob)
-    output = dropout(layer(prev), training=training)
-    return output
+    # Initialize weights using VarianceScaling with fan_avg mode
+    initializer = tf.keras.initializers.VarianceScaling(
+        scale=2.0, mode="fan_avg")
+
+    # Create a Dense layer with the specified activation and custom initializer
+    layer = tf.keras.layers.Dense(
+        units=n,
+        activation=activation,
+        kernel_initializer=initializer)
+
+    # Apply dropout with rate = 1 - keep_prob
+    if training:
+        layer = tf.nn.dropout(layer(prev), rate=1 - keep_prob)
+
+    return layer
