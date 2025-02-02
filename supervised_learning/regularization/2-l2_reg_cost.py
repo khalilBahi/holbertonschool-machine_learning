@@ -20,4 +20,3 @@ def l2_reg_cost(cost, model):
         l2_cost.append(tf.reduce_sum(layer.losses) + cost)
 
     return tf.stack(l2_cost[1:])
-
