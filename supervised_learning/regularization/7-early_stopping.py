@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Task 7: 7. Early Stopping"""
-import tensorflow as tf
 
 
 def early_stopping(cost, opt_cost, threshold, patience, count):
