@@ -15,44 +15,55 @@ def lenet5(X):
         K.Model: A Keras Model compiled to use Adam
         optimizer and categorical crossentropy loss.
     """
-    # initialize global parameters
-    init = K.initializers.he_normal()
+    # Initialize the HeNormal initializer
+    init = K.initializers.HeNormal(seed=0)
 
-    # First CONVNET
-    conv1 = K.layers.Conv2D(filters=6, kernel_size=5,
-                            padding='same', activation='relu',
-                            kernel_initializer=init)(X)
-    # Pool net of CONV1
-    pool1 = K.layers.MaxPooling2D(pool_size=[2, 2], strides=2)(conv1)
+    # Define the model architecture
+    model = K.Sequential(
+        [
+            X,
+            # First convolutional layer
+            K.layers.Conv2D(
+                filters=6,
+                kernel_size=5,
+                padding="same",
+                activation="relu",
+                kernel_initializer=init,
+            ),
+            # First pooling layer
+            K.layers.MaxPool2D(pool_size=2, strides=2),
+            # Second convolutional layer
+            K.layers.Conv2D(
+                filters=16, kernel_size=5, activation="relu",
+                kernel_initializer=init
+            ),
+            # Second pooling layer
+            K.layers.MaxPool2D(pool_size=2, strides=2),
+            # Flatten the output
+            K.layers.Flatten(),
+            # First fully connected layer
+            K.layers.Dense(
+                units=120,
+                activation="relu",
+                kernel_initializer=init),
+            # Second fully connected layer
+            K.layers.Dense(
+                units=84,
+                activation="relu",
+                kernel_initializer=init),
+            # Output layer
+            K.layers.Dense(
+                units=10,
+                activation="softmax",
+                kernel_initializer=init),
+        ]
+    )
 
-    # Second CONVNET
-    conv2 = K.layers.Conv2D(filters=16, kernel_size=5,
-                            padding='valid', activation='relu',
-                            kernel_initializer=init)(pool1)
-    # Pool net of CONV2
-    pool2 = K.layers.MaxPooling2D(pool_size=[2, 2], strides=2)(conv2)
-
-    # Flatten the convolutional layers
-    flatten = K.layers.Flatten()(pool2)
-
-    # Fully connected layer 1
-    FC1 = K.layers.Dense(units=120, activation='relu',
-                         kernel_initializer=init)(flatten)
-    # Fully connected layer 2
-    FC2 = K.layers.Dense(units=84, activation='relu',
-                         kernel_initializer=init)(FC1)
-    # Fully connected layer 3
-    FC3 = K.layers.Dense(units=10, kernel_initializer=init,
-                         activation='softmax')(FC2)
-
-    # Create Model
-    model = K.models.Model(X, FC3)
-
-    # Set Adam optimizer
-    adam = K.optimizers.Adam()
-
-    # Compile model
-    model.compile(optimizer=adam, loss='categorical_crossentropy',
-                  metrics=['accuracy'])
+    # Compile the model
+    model.compile(
+        loss="categorical_crossentropy",
+        optimizer=K.optimizers.Adam(),
+        metrics=["accuracy"],
+    )
 
     return model
