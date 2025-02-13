@@ -23,50 +23,62 @@ def lenet5(x, y):
             the accuracy of the network.
     """
     # initialize global parameters
-    init = tf.contrib.layers.variance_scaling_initializer()
+    init = tf.keras.initializers.VarianceScaling(scale=2.0)
 
-    # Set the variable of activation 'relu'
-    activation = tf.nn.relu
+    # First convolutional layer
+    conv_1 = tf.layers.Conv2D(
+        filters=6,
+        kernel_size=5,
+        padding="same",
+        activation="relu",
+        kernel_initializer=init,
+    )(x)
 
-    # First CONVNET
-    conv1 = tf.layers.Conv2D(filters=6, kernel_size=5,
-                             padding='same', activation=activation,
-                             kernel_initializer=init)(x)
-    # Pool net of CONV1
-    pool1 = tf.layers.MaxPooling2D(pool_size=[2, 2], strides=2)(conv1)
+    # First pooling layer
+    pool_1 = tf.layers.MaxPooling2D(pool_size=2, strides=2)(conv_1)
 
-    # Second CONVNET
-    conv2 = tf.layers.Conv2D(filters=16, kernel_size=5,
-                             padding='valid', activation=activation,
-                             kernel_initializer=init)(pool1)
-    # Pool net of CONV2
-    pool2 = tf.layers.MaxPooling2D(pool_size=[2, 2], strides=2)(conv2)
+    # Second convolutional layer
+    conv_2 = tf.layers.Conv2D(
+        filters=16,
+        kernel_size=5,
+        padding="valid",
+        activation="relu",
+        kernel_initializer=init,
+    )(pool_1)
 
-    # Flatten the convolutional layers
-    flatten = tf.layers.Flatten()(pool2)
+    # Second pooling layer
+    pool_2 = tf.layers.MaxPooling2D(pool_size=2, strides=2)(conv_2)
 
-    # Fully connected layer 1
-    FC1 = tf.layers.Dense(units=120, activation=activation,
-                          kernel_initializer=init)(flatten)
-    # Fully connected layer 2
-    FC2 = tf.layers.Dense(units=84, activation=activation,
-                          kernel_initializer=init)(FC1)
-    # Fully connected layer 3
-    FC3 = tf.layers.Dense(units=10, kernel_initializer=init)(FC2)
+    # Flatten the output of the second pooling layer
+    flat = tf.layers.Flatten()(pool_2)
 
-    # Prediction variable
-    y_pred = FC3
+    # First fully connected layer
+    layer_1 = tf.layers.Dense(
+        units=120, activation="relu", name="layer", kernel_initializer=init
+    )(flat)
+
+    # Second fully connected layer
+    layer_2 = tf.layers.Dense(
+        units=84, activation="relu", name="layer", kernel_initializer=init
+    )(layer_1)
+
+    # Output layer
+    output = tf.layers.Dense(
+        units=10, activation=None, name="layer", kernel_initializer=init
+    )(layer_2)
 
     # Loss function
-    loss = tf.losses.softmax_cross_entropy(y, FC3)
+    losses = tf.losses.softmax_cross_entropy(onehot_labels=y, logits=output)
 
-    # Train function
-    train = tf.train.AdamOptimizer().minimize(loss)
+    # Calculate accuracy
+    comparation = tf.math.equal(tf.argmax(y, 1), tf.argmax(output, 1))
+    accuracy = tf.reduce_mean(tf.cast(comparation, tf.float32))
 
-    # accuracy
-    correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_pred, 1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    # Optimizer
+    optimizer = tf.train.AdamOptimizer()
+    train = optimizer.minimize(losses)
 
-    y_pred = tf.nn.softmax(y_pred)
+    # Softmax output
+    out = tf.nn.softmax(output)
 
-    return y_pred, train, loss, accuracy
+    return out, train, losses, accuracy
