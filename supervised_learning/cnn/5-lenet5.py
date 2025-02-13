@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Task 5. LeNet-5 (Keras)"""
-import tensorflow.keras as K  # type: ignore
+from tensorflow import keras as K  # type: ignore
 
 
 def lenet5(X):
