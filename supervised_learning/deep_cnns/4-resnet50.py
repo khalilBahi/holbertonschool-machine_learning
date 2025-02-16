@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Task 4: ResNet-50"""
 from tensorflow import keras as K
-
-identity_block = __import__("2-identity_block").identity_block
-projection_block = __import__("3-projection_block").projection_block
+identity_block = __import__('2-identity_block').identity_block
+projection_block = __import__('3-projection_block').projection_block
 
 
 def resnet50():
