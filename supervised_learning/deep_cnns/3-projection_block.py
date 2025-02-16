@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Task 2. Identity Block"""
-import tensorflow.keras as K # type: ignore
+"""Task 3. Identity Block"""
+from tensorflow import keras as K
 
 
 def projection_block(A_prev, filters, s=2):
