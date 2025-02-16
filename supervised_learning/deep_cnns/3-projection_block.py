@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Task 3. Identity Block"""
+"""Task 3. Projection Block"""
 from tensorflow import keras as K
 
 
@@ -33,12 +33,11 @@ def projection_block(A_prev, filters, s=2):
         filters=F11,
         kernel_size=(1, 1),
         strides=(s, s),
-        padding="same",
+        padding="valid",
         kernel_initializer=initializer,
-        activation="linear",
     )(A_prev)
-    bn1 = K.layers.BatchNormalization()(conv1)
-    relu1 = K.layers.ReLU()(bn1)
+    bn1 = K.layers.BatchNormalization(axis=3)(conv1)
+    relu1 = K.layers.Activation("relu")(bn1)
 
     # Second 3x3 convolution
     conv2 = K.layers.Conv2D(
@@ -47,35 +46,32 @@ def projection_block(A_prev, filters, s=2):
         strides=(1, 1),
         padding="same",
         kernel_initializer=initializer,
-        activation="linear",
     )(relu1)
-    bn2 = K.layers.BatchNormalization()(conv2)
-    relu2 = K.layers.ReLU()(bn2)
+    bn2 = K.layers.BatchNormalization(axis=3)(conv2)
+    relu2 = K.layers.Activation("relu")(bn2)
 
     # Third 1x1 convolution
     conv3 = K.layers.Conv2D(
         filters=F12,
         kernel_size=(1, 1),
         strides=(1, 1),
-        padding="same",
+        padding="valid",
         kernel_initializer=initializer,
-        activation="linear",
     )(relu2)
-    bn3 = K.layers.BatchNormalization()(conv3)
+    bn3 = K.layers.BatchNormalization(axis=3)(conv3)
 
     # Shortcut path
     conv_shortcut = K.layers.Conv2D(
         filters=F12,
         kernel_size=(1, 1),
         strides=(s, s),
-        padding="same",
+        padding="valid",
         kernel_initializer=initializer,
-        activation="linear",
     )(A_prev)
-    bn_shortcut = K.layers.BatchNormalization()(conv_shortcut)
+    bn_shortcut = K.layers.BatchNormalization(axis=3)(conv_shortcut)
 
     # Add main path and shortcut
     add = K.layers.Add()([bn3, bn_shortcut])
-    activated_output = K.layers.ReLU()(add)
+    activated_output = K.layers.Activation("relu")(add)
 
     return activated_output
