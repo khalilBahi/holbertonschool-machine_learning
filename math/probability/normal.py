@@ -2,7 +2,6 @@
 """
 Normal distribution
 """
-import math
 
 class Normal:
     def __init__(self, data=None, mean=0., stddev=1.):
@@ -43,7 +42,7 @@ class Normal:
             # Calculate the standard deviation of the data
             # Variance = (Σ(x - mean)^2) / (n - 1) for sample standard deviation
             variance = sum((x - self.mean) ** 2 for x in data) / (len(data) - 1)
-            self.stddev = float(math.sqrt(variance))
+            self.stddev = float(variance ** 0.5)
 
     def z_score(self, x):
         """
@@ -84,7 +83,7 @@ class Normal:
         pi = 3.1415926536
         
         # Calculate the PDF: f(x) = (1 / (σ * sqrt(2π))) * e^(-((x - μ)^2) / (2σ^2))
-        coefficient = 1 / (self.stddev * math.sqrt(2 * pi))
+        coefficient = 1 / (self.stddev * (2*self.pi)**.5)
         exponent = -((x - self.mean) ** 2) / (2 * (self.stddev ** 2))
         return coefficient * (e ** exponent)
 
@@ -104,6 +103,6 @@ class Normal:
         
         # Calculate the CDF: F(x) = (1 / 2) * (1 + erf((x - μ) / (σ * sqrt(2))))
         coefficient = 1 / 2
-        argument = (x - self.mean) / (self.stddev * math.sqrt(2))
+        argument = (x - self.mean) / (self.stddev * 2 ** 0.5)
         erf = (2 / pi ** 0.5) * (argument - (argument ** 3) / 3 + (argument ** 5) / 10 - (argument ** 7) / 42 + (argument ** 9) / 216)
         return coefficient * (1 + erf)
