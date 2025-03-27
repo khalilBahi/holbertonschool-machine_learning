@@ -21,29 +21,24 @@ class Normal:
         - ValueError: If stddev is not positive or if data does not contain multiple values.
         - TypeError: If data is not a list.
         """
-        # Case 1: If data is not given (i.e., data is None)
-        if data is None:
-            # Check if stddev is positive
-            if stddev <= 0:
-                raise ValueError("stddev must be a positive value")
-            # Save mean and stddev as floats
-            self.mean = float(mean)
-            self.stddev = float(stddev)
-        else:
-            # Case 2: If data is given
-            # Check if data is a list
-            if not isinstance(data, list):
-                raise TypeError("data must be a list")
-            # Check if data has at least two data points
-            if len(data) < 2:
-                raise ValueError("data must contain multiple values")
-            # Calculate the mean of the data
-            self.mean = float(sum(data) / len(data))
-            # Calculate the standard deviation of the data
-            # Variance = (Σ(x - mean)^2) / (n - 1) for sample standard deviation
-            variance = sum((x - self.mean) ** 2 for x in data) / (len(data) - 1)
-            self.stddev = float(variance ** 0.5)
+        self.e = 2.7182818285
+        self.pi = 3.1415926536
 
+        if data is not None:
+            if type(data) is not list:
+                raise TypeError('data must be a list')
+            if len(data) < 2:
+                raise ValueError('data must contain multiple values')
+            self.mean = float(sum(data) / len(data))
+            new_list = []
+            for i in data:
+                new_list.append((i-self.mean)**2)
+            self.stddev = (sum(new_list) / len(data)) ** 0.5
+        else:
+            if stddev <= 0:
+                raise ValueError('stddev must be a positive value')
+            self.mean = mean
+            self.stddev = stddev
     def z_score(self, x):
         """
         Calculate the z-score of a given x-value.
