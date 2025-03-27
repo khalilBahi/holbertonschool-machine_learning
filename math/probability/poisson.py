@@ -2,8 +2,29 @@
 """
 Poisson distribution
 """
-import math
-import numpy as np
+def factorial(n):
+    """
+    Calculates the factorial of a given number.
+
+    Parameters:
+    n (int):
+    The number for which the factorial is to be computed.
+
+    Returns:
+    int: The factorial of `n`.
+
+    Notes:
+    - The factorial of 0 is defined as 1.
+    - The function uses an iterative approach.
+    """
+    if n == 0:
+        return 1
+
+    fact = 1
+
+    for i in range(1, n+1):
+        fact = fact * i
+    return fact
 
 class Poisson:
     def __init__(self, data=None, lambtha=1.):
@@ -64,8 +85,8 @@ class Poisson:
         
         # Calculate the PMF: P(X = k) = (e^(-λ) * λ^k) / k!
         # where λ is self.lambtha
-        numerator = e**(-self.lambtha) * (self.lambtha ** k)
-        denominator = math.factorial(k)
+        numerator = (e**(-self.lambtha) * (self.lambtha ** k))
+        denominator = factorial(k)
         return numerator / denominator
 
 
@@ -96,7 +117,7 @@ class Poisson:
         cdf_value = 0
         for i in range(k + 1):
             numerator = e**(-self.lambtha) * (self.lambtha ** i)
-            denominator = math.factorial(i)
+            denominator = factorial(i)
             cdf_value += numerator / denominator
         
         return cdf_value
