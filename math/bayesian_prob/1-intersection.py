@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """0. Likelihood"""
 import numpy as np
-from scipy.special import comb
+
 
 def n_choose_x(n, x):
     """
