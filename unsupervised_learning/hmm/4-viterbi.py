@@ -22,7 +22,7 @@ def viterbi(Observation, Emission, Transition, Initial):
     """
     # Get dimensions
     T = Observation.shape[0]  # Number of observations
-    N = Emission.shape     # Number of states, number of possible observations
+    N, M = Emission.shape     # Number of states
 
     # Initialize Viterbi probability matrix and backpointer
     V = np.zeros((N, T))
