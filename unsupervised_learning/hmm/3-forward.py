@@ -21,7 +21,7 @@ def forward(Observation, Emission, Transition, Initial):
     """
     # Get dimensions
     T = Observation.shape[0]  # Number of observations
-    N = Emission.shape     # Number of states, number of possible observations
+    N, M = Emission.shape     # Number of states
 
     # Initialize forward probability matrix
     F = np.zeros((N, T))
