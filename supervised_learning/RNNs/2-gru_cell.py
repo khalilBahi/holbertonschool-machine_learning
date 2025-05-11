@@ -4,6 +4,7 @@ import numpy as np
 
 
 class GRUCell:
+    """class GRUCell"""
     def __init__(self, i, h, o):
         """Initialize the GRU cell.
 
