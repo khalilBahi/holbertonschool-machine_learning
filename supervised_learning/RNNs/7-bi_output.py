@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """7. Bidirectional Output"""
+
 import numpy as np
 
 
