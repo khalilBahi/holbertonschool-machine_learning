@@ -17,8 +17,10 @@ class BidirectionalCell:
             o (int): Dimensionality of the outputs.
 
         Attributes:
-            Whf (numpy.ndarray): Weight matrix for forward hidden state, shape (h+i, h).
-            Whb (numpy.ndarray): Weight matrix for backward hidden state, shape (h+i, h).
+            Whf (numpy.ndarray): Weight matrix for
+            forward hidden state, shape (h+i, h).
+            Whb (numpy.ndarray): Weight matrix for
+            backward hidden state, shape (h+i, h).
             Wy (numpy.ndarray): Weight matrix for output, shape (2*h, o).
             bhf (numpy.ndarray): Bias for forward hidden state, shape (1, h).
             bhb (numpy.ndarray): Bias for backward hidden state, shape (1, h).
@@ -43,7 +45,8 @@ class BidirectionalCell:
             x_t (numpy.ndarray): Input data, shape (m, i).
 
         Returns:
-            h_next (numpy.ndarray): Next hidden state in forward direction, shape (m, h).
+            h_next (numpy.ndarray): Next hidden
+            state in forward direction, shape (m, h).
         """
         # Concatenate h_prev and x_t along axis 1
         # Shape: (m, h+i), e.g., (8, 15+10) = (8, 25)
@@ -61,11 +64,13 @@ class BidirectionalCell:
         Calculate the backward hidden state for one time step.
 
         Args:
-            h_next (numpy.ndarray): Next hidden state in backward direction, shape (m, h).
+            h_next (numpy.ndarray): Next hidden state
+            in backward direction, shape (m, h).
             x_t (numpy.ndarray): Input data, shape (m, i).
 
         Returns:
-            h_prev (numpy.ndarray): Previous hidden state in backward direction, shape (m, h).
+            h_prev (numpy.ndarray): Previous hidden
+            state in backward direction, shape (m, h).
         """
         # Concatenate h_next and x_t along axis 1
         # Shape: (m, h+i), e.g., (8, 15+10) = (8, 25)
