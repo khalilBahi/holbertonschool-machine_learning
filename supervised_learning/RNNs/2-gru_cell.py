@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-
+"""2. GRU Cell"""
 import numpy as np
+
 
 class GRUCell:
     def __init__(self, i, h, o):
@@ -11,13 +12,15 @@ class GRUCell:
             h (int): Dimensionality of the hidden state
             o (int): Dimensionality of the outputs
         """
-        # Weights for update gate (Wz), reset gate (Wr), intermediate hidden state (Wh), and output (Wy)
+        # Weights for update gate (Wz), reset gate (Wr), intermediate hidden
+        # state (Wh), and output (Wy)
         self.Wz = np.random.randn(h + i, h)
         self.Wr = np.random.randn(h + i, h)
         self.Wh = np.random.randn(h + i, h)
         self.Wy = np.random.randn(h, o)
-        
-        # Biases for update gate (bz), reset gate (br), intermediate hidden state (bh), and output (by)
+
+        # Biases for update gate (bz), reset gate (br), intermediate hidden
+        # state (bh), and output (by)
         self.bz = np.zeros((1, h))
         self.br = np.zeros((1, h))
         self.bh = np.zeros((1, h))
