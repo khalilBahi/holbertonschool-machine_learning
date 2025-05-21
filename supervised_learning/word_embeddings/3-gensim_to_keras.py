@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """3. Extract Word2Vec"""
 
-import tf_utils  # This will suppress TensorFlow warnings
-import tensorflow.keras as keras  # type: ignore
+import tensorflow as tf  # type: ignore
 
 
 def gensim_to_keras(model):
@@ -23,7 +22,7 @@ def gensim_to_keras(model):
 
     # Create a Keras Embedding layer
     # Set trainable=True so the weights can be further updated in Keras
-    embedding_layer = keras.layers.Embedding(
+    embedding_layer = tf.keras.layers.Embedding(
         input_dim=vocab_size,
         output_dim=embedding_dim,
         weights=[model.wv.vectors],
