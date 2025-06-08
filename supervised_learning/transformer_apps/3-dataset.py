@@ -3,8 +3,7 @@
 
 import tensorflow as tf
 import tensorflow_datasets as tfds
-import numpy as np
-from transformers import BertTokenizerFast
+import transformers
 
 
 class Dataset:
@@ -96,10 +95,10 @@ class Dataset:
             tokenizer_en: English tokenizer
         """
         # Load base pre-trained tokenizers
-        base_tokenizer_pt = BertTokenizerFast.from_pretrained(
+        base_tokenizer_pt = transformers.BertTokenizerFast.from_pretrained(
             'neuralmind/bert-base-portuguese-cased'
         )
-        base_tokenizer_en = BertTokenizerFast.from_pretrained(
+        base_tokenizer_en = transformers.BertTokenizerFast.from_pretrained(
             'bert-base-uncased'
         )
 
@@ -158,10 +157,7 @@ class Dataset:
         pt_tokens = [vocab_size] + pt_tokens + [vocab_size + 1]
         en_tokens = [vocab_size] + en_tokens + [vocab_size + 1]
 
-        # Convert to numpy arrays
-        pt_tokens = np.array(pt_tokens)
-        en_tokens = np.array(en_tokens)
-
+        # Return as lists (will be converted to tensors by tf.py_function)
         return pt_tokens, en_tokens
 
     def tf_encode(self, pt, en):
