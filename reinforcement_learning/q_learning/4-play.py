@@ -4,7 +4,6 @@
 """
 
 import numpy as np
-import re
 
 
 def convert_ansi_to_backticks(text):
@@ -13,7 +12,31 @@ def convert_ansi_to_backticks(text):
     """
     # Replace ANSI highlight codes with backticks
     # \x1b[41m starts red background, \x1b[0m ends formatting
-    text = re.sub(r'\x1b\[41m(.)\x1b\[0m', r'`\1`', text)
+    # Find and replace the ANSI codes manually
+    start_code = '\x1b[41m'
+    end_code = '\x1b[0m'
+
+    while start_code in text and end_code in text:
+        start_idx = text.find(start_code)
+        if start_idx == -1:
+            break
+
+        # Find the character after the start code
+        char_idx = start_idx + len(start_code)
+        if char_idx >= len(text):
+            break
+
+        # Find the end code after the character
+        end_idx = text.find(end_code, char_idx)
+        if end_idx == -1:
+            break
+
+        # Extract the character between the codes
+        char = text[char_idx:end_idx]
+
+        # Replace the entire sequence with backticks around the character
+        text = text[:start_idx] + '`' + char + '`' + text[end_idx + len(end_code):]
+
     return text
 
 
@@ -40,7 +63,7 @@ def play(env, Q, max_steps=100):
     initial_render = convert_ansi_to_backticks(env.render())
     rendered_outputs.append(initial_render)
 
-    for step in range(max_steps):
+    for _ in range(max_steps):
         # Always exploit - choose action with highest Q-value
         action = np.argmax(Q[state])
 
