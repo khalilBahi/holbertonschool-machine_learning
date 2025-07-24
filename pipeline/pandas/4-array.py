@@ -3,8 +3,6 @@
 Module that contains a function to convert DataFrame columns to numpy array
 """
 
-import numpy as np
-
 
 def array(df):
     """
