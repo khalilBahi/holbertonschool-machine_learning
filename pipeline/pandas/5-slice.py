@@ -3,8 +3,6 @@
 Module that contains a function to slice a DataFrame
 """
 
-import pandas as pd
-
 
 def slice(df):
     """
