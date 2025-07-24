@@ -4,7 +4,6 @@ Module that contains a function to concatenate two DataFrames
 """
 
 import pandas as pd
-
 index = __import__("10-index").index
 
 
