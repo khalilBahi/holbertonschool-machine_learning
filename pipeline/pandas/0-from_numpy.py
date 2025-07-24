@@ -4,7 +4,6 @@ Module that contains a function to create a pandas DataFrame from a numpy array
 """
 
 import pandas as pd
-import string
 
 
 def from_numpy(array):
@@ -22,8 +21,8 @@ def from_numpy(array):
     num_cols = array.shape[1] if len(array.shape) > 1 else 1
 
     # Generate column labels: A, B, C, ... up to the number of columns
-    # Using string.ascii_uppercase to get uppercase letters
-    columns = list(string.ascii_uppercase[:num_cols])
+    # Using chr() and ord() to generate uppercase letters
+    columns = [chr(ord('A') + i) for i in range(num_cols)]
 
     # Create and return the DataFrame
     return pd.DataFrame(array, columns=columns)
