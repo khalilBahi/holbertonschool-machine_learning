@@ -3,7 +3,10 @@
 Module that contains a function to create a hierarchical
 DataFrame with Timestamp as first level
 """
+
 import pandas as pd
+
+index = __import__('10-index').index
 
 
 def hierarchy(df1, df2):
@@ -23,9 +26,6 @@ def hierarchy(df1, df2):
     Returns:
         pd.DataFrame: the concatenated DataFrame with hierarchical index
     """
-    # Import index function
-    index = __import__("10-index").index
-
     # Index both dataframes on their Timestamp columns
     df1_indexed = index(df1)
     df2_indexed = index(df2)
