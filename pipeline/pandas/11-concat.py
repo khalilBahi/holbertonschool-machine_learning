@@ -5,8 +5,6 @@ Module that contains a function to concatenate two DataFrames
 
 import pandas as pd
 
-index = __import__("10-index").index
-
 
 def concat(df1, df2):
     """
@@ -25,6 +23,7 @@ def concat(df1, df2):
     Returns:
         pd.DataFrame: the concatenated DataFrame
     """
+    index = __import__("10-index").index
     # Index both dataframes on their Timestamp columns
     df1_indexed = index(df1)
     df2_indexed = index(df2)
