@@ -44,7 +44,7 @@ def get_user_location(api_url):
                 current_time = int(time.time())
                 reset_timestamp = int(reset_time)
                 minutes_until_reset = max
-                (0, (reset_timestamp - current_time) // 15)
+                (0, (reset_timestamp - current_time) // 60)
                 print(f"Reset in {minutes_until_reset} min")
             else:
                 # Fallback if no reset header
