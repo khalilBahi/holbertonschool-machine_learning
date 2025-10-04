@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Initialize variables for a Gaussian Mixture Model"""
 import numpy as np
-kmeans = __import__('1-kmeans').kmeans
+
+kmeans = __import__("1-kmeans").kmeans
 
 
 def initialize(X, k):
@@ -27,7 +28,7 @@ def initialize(X, k):
         return None, None, None
 
     # Initialize equal prior probabilities with each cluster
-    pi = np.full((k,), fill_value=1/k)
+    pi = np.full((k,), fill_value=1 / k)
 
     # m (centroids) is initialized using K-means
     m, _ = kmeans(X, k)
