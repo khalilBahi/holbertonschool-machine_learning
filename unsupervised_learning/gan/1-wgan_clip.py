@@ -11,9 +11,16 @@ class WGAN_clip(keras.Model):
     This class represents a Wasserstein GAN (WGAN) with weight clipping.
     """
 
-    def __init__(self, generator, discriminator, latent_generator,
-                 real_examples, batch_size=200, disc_iter=2,
-                 learning_rate=.005):
+    def __init__(
+        self,
+        generator,
+        discriminator,
+        latent_generator,
+        real_examples,
+        batch_size=200,
+        disc_iter=2,
+        learning_rate=0.005,
+    ):
         """
         Initializes the WGAN model with a generator, discriminator,
         latent generator, and real examples.
@@ -28,28 +35,30 @@ class WGAN_clip(keras.Model):
         self.disc_iter = disc_iter
         self.learning_rate = learning_rate
 
-        self.beta_1 = .5
-        self.beta_2 = .9
+        self.beta_1 = 0.5
+        self.beta_2 = 0.9
 
         # Define the generator loss and optimizer:
         self.generator.loss = lambda x: -tf.reduce_mean(x)
         self.generator.optimizer = keras.optimizers.Adam(
             learning_rate=self.learning_rate,
-            beta_1=self.beta_1,
-            beta_2=self.beta_2)
+            beta_1=self.beta_1, beta_2=self.beta_2
+        )
         self.generator.compile(
-            optimizer=self.generator.optimizer, loss=self.generator.loss)
+            optimizer=self.generator.optimizer, loss=self.generator.loss
+        )
 
         # Define the discriminator loss and optimizer:
-        self.discriminator.loss = \
-            lambda x, y: tf.reduce_mean(y) - tf.reduce_mean(x)
+        self.discriminator.loss = lambda x, y: tf.reduce_mean(
+            y) - tf.reduce_mean(x)
         self.discriminator.optimizer = keras.optimizers.Adam(
             learning_rate=self.learning_rate,
-            beta_1=self.beta_1,
-            beta_2=self.beta_2)
+            beta_1=self.beta_1, beta_2=self.beta_2
+        )
         self.discriminator.compile(
             optimizer=self.discriminator.optimizer,
-            loss=self.discriminator.loss)
+            loss=self.discriminator.loss
+        )
 
     def get_fake_sample(self, size=None, training=False):
         """
@@ -57,7 +66,8 @@ class WGAN_clip(keras.Model):
         """
         if not size:
             size = self.batch_size
-        return self.generator(self.latent_generator(size), training=training)
+        return self.generator(self.latent_generator(size),
+                              training=training)
 
     def get_real_sample(self, size=None):
         """
@@ -98,17 +108,20 @@ class WGAN_clip(keras.Model):
 
             # Compute the gradients for the discriminator
             discr_gradients = disc_tape.gradient(
-                discr_loss, self.discriminator.trainable_variables)
+                discr_loss, self.discriminator.trainable_variables
+            )
 
             # Apply gradients to update discriminator weights
             self.discriminator.optimizer.apply_gradients(
-                zip(discr_gradients, self.discriminator.trainable_variables))
+                zip(discr_gradients, self.discriminator.trainable_variables)
+            )
 
             # Clip the new weights of the discriminator to [-1, 1]
             for weight in self.discriminator.trainable_weights:
-                weight.assign(tf.clip_by_value(weight,
-                                               clip_value_min=-1,
-                                               clip_value_max=1))
+                weight.assign(
+                    tf.clip_by_value(weight,
+                                     clip_value_min=-1, clip_value_max=1)
+                )
 
         # Step 2: Train the generator
         # Tape watching the weights of the discriminator
@@ -121,12 +134,13 @@ class WGAN_clip(keras.Model):
             gen_loss = self.generator.loss(fake_preds)
 
         # Compute the gradients for the generator
-        gen_gradients = gen_tape.gradient(
-            gen_loss, self.generator.trainable_variables)
+        gen_gradients = gen_tape.gradient(gen_loss,
+                                          self.generator.trainable_variables)
 
         # Apply gradients to update generator weights
         self.generator.optimizer.apply_gradients(
-            zip(gen_gradients, self.generator.trainable_variables))
+            zip(gen_gradients, self.generator.trainable_variables)
+        )
 
         # Return losses for both the discriminator and generator
         return {"discr_loss": discr_loss, "gen_loss": gen_loss}
