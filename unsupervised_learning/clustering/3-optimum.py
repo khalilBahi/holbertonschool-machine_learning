@@ -1,41 +1,44 @@
 #!/usr/bin/env python3
-"""tests for the optimum number of clusters by variance"""
+"""Calculates the maximization step in the EM algorithm for a GMM"""
 import numpy as np
-kmeans = __import__('1-kmeans').kmeans
-variance = __import__('2-variance').variance
 
 
-def optimum_k(X, kmin=1, kmax=None, iterations=1000):
-    """ tests for the optimum number of clusters by variance
-    @X: np.ndarray shape(n, d) data set
-    @kmin: pos int - min number of clusters to check for (inclusive)
-    @kmax: pos int - max number of clusters to check for (inclusive)
-    @iterations: pos int - max number of iterations for K-means
-    *should analyze atleast 2 diff cluster sizes
-    Returns: results, d_vars, or None, None on failure
-        @results: list containing the outputs of K-means for each cluster size
-        @d_vars: list - the diff in variance from smallest cluster size
-        for each cluster size
+def maximization(X, g):
     """
-    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
-        return None, None
-    if kmax is None:
-        kmax = X.shape[0]
-    if not isinstance(kmin, int) or not isinstance(kmax, int):
-        return None, None
-    if not isinstance(iterations, int):
-        return None, None
-    if kmin < 1 or kmax < 1 or kmin >= kmax or iterations < 1:
-        return None, None
+    Calculates the maximization step in the EM algorithm for a GMM.
 
-    results, d_vars = [], []
-    for i in range(kmin, kmax + 1):
-        centroids, clss = kmeans(X, i, iterations)
-        results.append((centroids, clss))
-        var = variance(X, centroids)
-        if i == kmin:
-            first_var = var
-        # get diff
-        d_vars.append(first_var - var)
+    Parameters:
+    - X (numpy.ndarray): 2D numpy array of shape (n, d) containing the dataset.
+    - g (numpy.ndarray): 2D numpy array of shape (k, n) containing the
+    posterior probabilities for each data point in each cluster.
 
-    return results, d_vars
+    Returns:
+    - pi (numpy.ndarray): 1D numpy array of shape (k,) containing the updated
+    priors for each cluster.
+    - m (numpy.ndarray): 2D numpy array of shape (k, d) containing the updated
+    centroid means for each cluster.
+    - S (numpy.ndarray): 3D numpy array of shape (k, d, d) containing the
+    updated covariance matrices for each cluster.
+    """
+    if (not isinstance(X, np.ndarray) or X.ndim != 2 or
+        not isinstance(g, np.ndarray) or g.ndim != 2 or
+        X.shape[0] != g.shape[1] or
+            not np.allclose(g.sum(axis=0), 1.0)):
+        return None, None, None
+
+    n, d = X.shape
+    k, _ = g.shape
+
+    # Update the priors
+    pi = np.sum(g, axis=1) / n
+
+    # Update the centroids
+    m = np.dot(g, X) / np.sum(g, axis=1)[:, np.newaxis]
+
+    # Update the covariance matrices, using the new centroids
+    S = np.zeros((k, d, d))
+    for i in range(k):
+        diff = X - m[i]
+        S[i] = np.dot(g[i] * diff.T, diff) / np.sum(g[i])
+
+    return pi, m, S
