@@ -1,41 +1,62 @@
 #!/usr/bin/env python3
-"""tests for the optimum number of clusters by variance"""
+"""Optimize k for K-means clustering"""
 import numpy as np
 kmeans = __import__('1-kmeans').kmeans
 variance = __import__('2-variance').variance
 
 
 def optimum_k(X, kmin=1, kmax=None, iterations=1000):
-    """ tests for the optimum number of clusters by variance
-    @X: np.ndarray shape(n, d) data set
-    @kmin: pos int - min number of clusters to check for (inclusive)
-    @kmax: pos int - max number of clusters to check for (inclusive)
-    @iterations: pos int - max number of iterations for K-means
-    *should analyze atleast 2 diff cluster sizes
-    Returns: results, d_vars, or None, None on failure
-        @results: list containing the outputs of K-means for each cluster size
-        @d_vars: list - the diff in variance from smallest cluster size
-        for each cluster size
     """
-    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
+    Tests for the optimum number of clusters by variance.
+
+    Parameters:
+    - X (numpy.ndarray): 2D numpy array of shape (n, d) containing the dataset.
+    - kmin (int): Minimum number of clusters to check for (inclusive).
+    - kmax (int): Maximum number of clusters to check for (inclusive).
+    - iterations (int): Maximum number of iterations for K-means.
+
+    Returns:
+    - tuple: (results, d_vars), or (None, None) on failure.
+        - results is a list containing the outputs of K-means for each
+        cluster size.
+        - d_vars is a list containing the difference in variance from the
+        smallest cluster size for each cluster size.
+    """
+    if not isinstance(X, np.ndarray) or X.ndim != 2:
         return None, None
-    if kmax is None:
-        kmax = X.shape[0]
-    if not isinstance(kmin, int) or not isinstance(kmax, int):
+    if not isinstance(kmin, int) or kmin <= 0:
         return None, None
-    if not isinstance(iterations, int):
+    if kmax is not None and (not isinstance(kmax, int) or kmax < kmin):
         return None, None
-    if kmin < 1 or kmax < 1 or kmin >= kmax or iterations < 1:
+    if not isinstance(iterations, int) or iterations <= 0:
+        return None, None
+    if isinstance(kmax, int) and kmax <= kmin:
         return None, None
 
-    results, d_vars = [], []
-    for i in range(kmin, kmax + 1):
-        centroids, clss = kmeans(X, i, iterations)
-        results.append((centroids, clss))
-        var = variance(X, centroids)
-        if i == kmin:
-            first_var = var
-        # get diff
-        d_vars.append(first_var - var)
+    if kmax is None:
+        max_clusters = X.shape[0]
+    else:
+        max_clusters = kmax
+
+    results = []
+    d_vars = []
+
+    # Calculations with kmin (smallest cluster size)
+    C, clss = kmeans(X, kmin, iterations)
+    base_variance = variance(X, C)
+    results.append((C, clss))
+    # Base difference with first variance (with itself) is zero
+    d_vars = [0.0]
+
+    # With each following cluster size k:
+    k = kmin + 1
+    while k < max_clusters + 1:
+        # Run kmeans algorithm and calc. variance of distance to centroids
+        C, clss = kmeans(X, k, iterations)
+        current_variance = variance(X, C)
+        # Add results and variances differences to the lists
+        results.append((C, clss))
+        d_vars.append(base_variance - current_variance)
+        k += 1
 
     return results, d_vars
