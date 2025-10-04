@@ -52,3 +52,65 @@ def determinant(matrix):
         d += (element * multiplier * determinant(sub_matrix))
         multiplier *= -1
     return (d)
+
+
+def minor(matrix):
+    """
+    Calculates the minor matrix of a square matrix
+
+    parameters:
+        matrix [list of lists]:
+            matrix whose minor matrix should be calculated
+
+    returns:
+        the minor matrix of matrix
+
+    raises:
+        TypeError: if matrix is not a list of lists (or is empty)
+        ValueError: if matrix is not a non-empty square matrix
+    """
+    # Validate type and non-emptiness
+    if type(matrix) is not list:
+        raise TypeError("matrix must be a list of lists")
+    if len(matrix) == 0:
+        # Match project convention: empty -> TypeError with this message
+        raise TypeError("matrix must be a list of lists")
+    for row in matrix:
+        if type(row) is not list:
+            raise TypeError("matrix must be a list of lists")
+
+    n = len(matrix)
+
+    # Handle 1x1 (and degenerate [ [] ] case) explicitly
+    if n == 1:
+        if len(matrix[0]) == 0:
+            return [[1]]
+        if len(matrix[0]) != 1:
+            raise ValueError("matrix must be a non-empty square matrix")
+        return [[1]]
+
+    # Validate square shape for n > 1
+    for row in matrix:
+        if len(row) != n:
+            raise ValueError("matrix must be a non-empty square matrix")
+
+    # Build the minor matrix
+    minors = []
+    for i in range(n):
+        minor_row = []
+        for j in range(n):
+            # Construct submatrix excluding row i and column j
+            sub = []
+            for r in range(n):
+                if r == i:
+                    continue
+                new_row = []
+                for c in range(n):
+                    if c == j:
+                        continue
+                    new_row.append(matrix[r][c])
+                sub.append(new_row)
+            minor_val = determinant(sub)
+            minor_row.append(minor_val)
+        minors.append(minor_row)
+    return minors
