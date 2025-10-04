@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Calculates the expectation step in the EM algorithm for a GMM"""
 import numpy as np
-
 pdf = __import__("5-pdf").pdf
 
 
