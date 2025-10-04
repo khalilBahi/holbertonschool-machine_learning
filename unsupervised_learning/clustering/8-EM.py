@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Performs the expectation maximization for a GMM"""
 import numpy as np
-
-initialize = __import__("4-initialize").initialize
-expectation = __import__("6-expectation").expectation
-maximization = __import__("7-maximization").maximization
+initialize = __import__('4-initialize').initialize
+expectation = __import__('6-expectation').expectation
+maximization = __import__('7-maximization').maximization
 
 
 def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
@@ -13,7 +12,7 @@ def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
     Model (GMM) on a given dataset.
 
     Parameters:
-    - X (numpy.ndarray): dataset to be clustered, of shape(n, d) where n is
+    - X (numpy.ndarray): dataset to be clustered, of shape (n, d) where n is
     the number of data points and d is the dimensionality of each data point.
     - k (int): The number of clusters.
     - iterations (int, optional): The maximum number of iterations for the
