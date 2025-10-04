@@ -1,35 +1,35 @@
 #!/usr/bin/env python3
-"""
-11. GMM
-"""
-
-
+"""GMM clustering using sklearn"""
 import sklearn.mixture
 
 
 def gmm(X, k):
     """
-    Calculates a GMM from a dataset
+    Calculates a Gaussian Mixture Model from a dataset using the specified
+    number of clusters.
 
-    parameters:
-        X [numpy.ndarray of shape (n, d)]:
-            contains the dataset that will be used for K-means clustering
-            n: the number of data points
-            d: the number of dimensions for each data point
-        k [positive int]:
-            contains the number of clusters
+    Parameters:
+    - X (numpy.ndarray): The dataset with shape (n, d), where n is the number
+    of samples and d is the number of features.
+    - k (int): The number of clusters.
 
-    returns:
-        pi, m, S, clss, bic:
-            pi [numpy.ndarray of shape (k,)]:
-                containing the cluster priors
-            m [numpy.ndarray of shape (k, d)]:
-                containing the centroid means
-            S [numpy.ndarray of shape (k, d, d)]:
-                containing the covariance matrices
-            clss [numpy.ndarray of shape (n,)]:
-                containting the cluster indices for each data point
-            bic [numpy.ndarray of shape (kmax - kmin + 1)]:
-                containting the BIC value for each cluster size tested
+    Returns:
+    - pi (numpy.ndarray): A numpy array of shape (k,) containing the cluster
+    priors.
+    - m (numpy.ndarray): A numpy array of shape (k, d) containing the centroid
+    means.
+    - S (numpy.ndarray): A numpy array of shape (k, d, d) containing the
+    covariance matrices.
+    - clss (numpy.ndarray): A numpy array of shape (n,) containing the cluster
+    indices for each data point.
+    - bic (float): The Bayesian Information Criterion value for the model.
     """
-    return None, None, None, None, None
+    model = sklearn.mixture.GaussianMixture(n_components=k).fit(X)
+
+    pi = model.weights_
+    m = model.means_
+    S = model.covariances_
+    clss = model.predict(X)
+    bic = model.bic(X)
+
+    return pi, m, S, clss, bic
