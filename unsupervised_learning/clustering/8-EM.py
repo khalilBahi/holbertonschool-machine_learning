@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Performs the expectation maximization for a GMM"""
 import numpy as np
-initialize = __import__('4-initialize').initialize
-expectation = __import__('6-expectation').expectation
-maximization = __import__('7-maximization').maximization
+
+initialize = __import__("4-initialize").initialize
+expectation = __import__("6-expectation").expectation
+maximization = __import__("7-maximization").maximization
 
 
 def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
@@ -12,7 +13,7 @@ def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
     Model (GMM) on a given dataset.
 
     Parameters:
-    - X (numpy.ndarray): dataset to be clustered, of shape (n, d) where n is
+    - X (numpy.ndarray): dataset to be clustered, of shape(n, d) where n is
     the number of data points and d is the dimensionality of each data point.
     - k (int): The number of clusters.
     - iterations (int, optional): The maximum number of iterations for the
@@ -34,10 +35,14 @@ def expectation_maximization(X, k, iterations=1000, tol=1e-5, verbose=False):
     If the function fails, it returns (None, None, None, None, None).
     """
     if (
-        not isinstance(X, np.ndarray) or X.ndim != 2
-        or not isinstance(k, int) or k <= 0
-        or not isinstance(iterations, int) or iterations <= 0
-        or not isinstance(tol, float) or tol < 0
+        not isinstance(X, np.ndarray)
+        or X.ndim != 2
+        or not isinstance(k, int)
+        or k <= 0
+        or not isinstance(iterations, int)
+        or iterations <= 0
+        or not isinstance(tol, float)
+        or tol < 0
         or not isinstance(verbose, bool)
     ):
         return None, None, None, None, None
