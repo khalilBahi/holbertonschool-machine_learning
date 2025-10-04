@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Finds the best number of clusters for a GMM using the BIC"""
 import numpy as np
-expectation_maximization = __import__('8-EM').expectation_maximization
+
+expectation_maximization = __import__("8-EM").expectation_maximization
 
 
 def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
@@ -10,7 +11,7 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
     Bayesian Information Criterion (BIC).
 
     Parameters:
-    - X (numpy.ndarray): The dataset to be analyzed, of shape (n, d) where n
+    - X (numpy.ndarray): The dataset to be analyzed,of shape (n, d) where n
     is the number of data points and d is the number of dimensions.
     - kmin (int, optional): The minimum number of clusters to check
     (inclusive). Default is 1.
@@ -40,13 +41,20 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
     Returns `(None, None, None, None)` on failure.
     """
     if (
-        not isinstance(X, np.ndarray) or X.ndim != 2
-        or not isinstance(kmin, int) or kmin <= 0
-        or kmax is not None and (not isinstance(kmax, int) or kmax < kmin)
-        or not isinstance(iterations, int) or iterations <= 0
-        or isinstance(kmax, int) and kmax <= kmin
-        or not isinstance(iterations, int) or iterations <= 0
-        or not isinstance(tol, float) or tol < 0
+        not isinstance(X, np.ndarray)
+        or X.ndim != 2
+        or not isinstance(kmin, int)
+        or kmin <= 0
+        or kmax is not None
+        and (not isinstance(kmax, int) or kmax < kmin)
+        or not isinstance(iterations, int)
+        or iterations <= 0
+        or isinstance(kmax, int)
+        and kmax <= kmin
+        or not isinstance(iterations, int)
+        or iterations <= 0
+        or not isinstance(tol, float)
+        or tol < 0
         or not isinstance(verbose, bool)
     ):
         return None, None, None, None
@@ -64,8 +72,7 @@ def BIC(X, kmin=1, kmax=None, iterations=1000, tol=1e-5, verbose=False):
     # With each cluster size from kmin to kmax
     for k in range(kmin, kmax + 1):
         # Find the best fit with the GMM and current cluster size k
-        pi, m, S, g, li = expectation_maximization(
-            X, k, iterations, tol, verbose)
+        pi, m, S, g, li = expectation_maximization(X, k, iterations, tol, verbose)
 
         if pi is None or m is None or S is None or g is None:
             return None, None, None, None
