@@ -21,7 +21,7 @@ def pdf(X, m, S):
     if m.shape[0] != d or S.shape[0] != S.shape[1] or S.shape[0] != d:
         return None
     det = np.linalg.det(S)
-    p1 = 1 / ((2 * np.pi) ** (d / 2) * det ** 0.5)
+    p1 = 1 / ((2 * np.pi) ** (d / 2) * det**0.5)
     Xm = X - m
     X_t = np.linalg.inv(S) @ Xm.T
 
