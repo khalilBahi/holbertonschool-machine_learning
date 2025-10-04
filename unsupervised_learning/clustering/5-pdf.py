@@ -1,33 +1,30 @@
 #!/usr/bin/env python3
-"""
-5. PDF
-"""
-
-
+"""Calculate the probability density function of Gaussian distribution"""
 import numpy as np
 
 
 def pdf(X, m, S):
+    """Calculate the probability density function of Gaussian distribution
+    @X: np.ndarray shape(n,d) data points whose PDF should be evaluated
+    @m: np.ndarray shape(d,) mean of distribution
+    @S: np.ndarray shape(d,d) covariance of the distribution
+    Return: P or None on failure
+        @P: np.ndarray of shape(n,) the PDF values for each data point
     """
-    Calculates the probability density function of a Gaussian distribution
+    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
+        return None
+    if not isinstance(m, np.ndarray) or len(m.shape) != 1:
+        return None
+    if not isinstance(S, np.ndarray) or len(S.shape) != 2:
+        return None
+    d = X.shape[1]
+    if m.shape[0] != d or S.shape[0] != S.shape[1] or S.shape[0] != d:
+        return None
+    det = np.linalg.det(S)
+    p1 = 1 / ((2 * np.pi) ** (d / 2) * det ** 0.5)
+    Xm = X - m
+    X_t = np.linalg.inv(S) @ Xm.T
 
-    parameters:
-        X [numpy.ndarray of shape (n, d)]:
-            contains the dataset whose PDF should be calculated
-            n: the number of data points
-            d: the number of dimensions for each data point
-        m [numpy.ndarray of shape (d,)]:
-            contains the mean of the distribution
-        S [numpy.ndarray of shape (d, d)]:
-            contains the covariance of the distribution
-
-    not allowed to use any loops
-    not allowed to use the function numpy.diag or method numpy.ndarray.diagonal
-
-    returns:
-        P [numpy.ndarray of shape (n,)]:
-            containing the PDF values for each data point
-            all values in P should have a minimum value of 1e-300
-        or None on failure
-    """
-    return None
+    p2 = np.exp(-0.5 * np.sum(Xm * X_t.T, axis=1))
+    P = p1 * p2.T
+    return np.where(P <= 1e-300, 1e-300, P)
