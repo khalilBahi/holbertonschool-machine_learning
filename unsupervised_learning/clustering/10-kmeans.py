@@ -16,7 +16,7 @@ def kmeans(X, k):
     - C (numpy.ndarray): A numpy array of shape (k, d) containing the
     centroid means for each cluster.
     - clss (numpy.ndarray): A numpy array of shape (n,) containing the
-    index of the cluster in C that each data point belongs to.
+    index of the cluster in C that each data pointbelongs to.
 
     """
     kmeans_result = sklearn.cluster.KMeans(n_clusters=k).fit(X)
