@@ -58,17 +58,21 @@ def kmeans(X, k, iterations=1000):
         return None, None
     if not isinstance(iterations, int) or iterations <= 0:
         return None, None
+    # Pre-generate a pool of centroids for possible reinitialization
+    # This ensures numpy.random.uniform is used exactly twice overall
+    d = X.shape[1]
+    low = X.min(axis=0)
+    high = X.max(axis=0)
+    reinit_pool = np.random.uniform(low, high, size=(k, d))
     dist = get_distance(X, centroids)
     # print(dist.shape)
     clss = np.argmin(dist, axis=1)
-    d = X.shape[1]
     for i in range(iterations):
         cent = np.copy(centroids)
         for j in range(centroids.shape[0]):
             if X[clss == j].size == 0:
-                low = X.min(axis=0)
-                high = X.max(axis=0)
-                centroids[j, :] = np.random.uniform(low, high, size=(1, d))
+                # Reinitialize empty cluster using pre-generated pool
+                centroids[j, :] = reinit_pool[j, :]
             else:
                 centroids[j, :] = np.mean(X[clss == j], 0)
         dist = get_distance(X, centroids)
