@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""3. Optimize k"""
-
-
+"""tests for the optimum number of clusters by variance"""
+import numpy as np
+kmeans = __import__('1-kmeans').kmeans
+variance = __import__('2-variance').variance
 
 
 def optimum_k(X, kmin=1, kmax=None, iterations=1000):
-    """tests for the optimum number of clusters by variance
+    """ tests for the optimum number of clusters by variance
     @X: np.ndarray shape(n, d) data set
     @kmin: pos int - min number of clusters to check for (inclusive)
     @kmax: pos int - max number of clusters to check for (inclusive)
