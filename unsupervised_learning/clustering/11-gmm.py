@@ -9,7 +9,7 @@ def gmm(X, k):
     number of clusters.
 
     Parameters:
-    - X (numpy.ndarray): The dataset with shape (n, d), where n is the number
+    - X (numpy.ndarray): The dataset with shape (n, d),where n is the number
     of samples and d is the number of features.
     - k (int): The number of clusters.
 
