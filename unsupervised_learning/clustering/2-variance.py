@@ -16,20 +16,22 @@ def variance(X, C):
     Returns:
         var: total variance, or None on failure
     """
-    # Input validation
-    if not isinstance(X, np.ndarray) or not isinstance(C, np.ndarray):
+    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
+        # print("Invalid X, must be np.ndarray of shape(n, d)")
         return None
-    if len(X.shape) != 2 or len(C.shape) != 2 or X.shape[1] != C.shape[1]:
+    n, dx = X.shape
+    if not isinstance(C, np.ndarray) or len(C.shape) != 2:
+        # print("Invalid X, must be np.ndarray of shape(n, d)")
         return None
-
-    # Calculate distances to all centroids for all points
-    # X: (n, d), C[:, np.newaxis]: (k, 1, d) -> distances: (k, n, d)
-    distances = ((X - C[:, np.newaxis]) ** 2).sum(axis=2)
-
-    # Get minimum distance for each point (distance to its cluster centroid)
-    min_distances = np.min(distances, axis=0)
-
-    # Total variance is sum of squared distances to nearest centroid
-    var = np.sum(min_distances)
-
+    k, dc = C.shape
+    if not isinstance(k, int) or k <= 0 or k >= n or dx != dc:
+        # print("Invalid k, must be int > 0 and < n")
+        return None
+    # sqrt((x1 - X2)^2 + (y1 - y2)^2)
+    dist = ((X - C[:, np.newaxis]) ** 2).sum(axis=2)
+    min_dist = np.min(dist, axis=0)
+    # print(min_dist.sum())
+    # print(min_dist.shape)
+    var = np.sum(min_dist)
+    # print(var)
     return var
