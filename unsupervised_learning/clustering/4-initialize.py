@@ -1,42 +1,33 @@
 #!/usr/bin/env python3
-"""
-4. Initialize GMM
-"""
+"""Initializes variables for a Gaussian mixture model"""
 import numpy as np
-
-kmeans = __import__("1-kmeans").kmeans
+kmeans = __import__('1-kmeans').kmeans
 
 
 def initialize(X, k):
+    """Initializes variables for a Gaussian mixture model
+    @X: np.ndarray shape(n, d) - data set
+    @k: pos int, number of clusters
+    Returns: pi, m, S or None, None, None on failure
+        @pi: np.ndarray shape(k,) containing the priors for each cluster
+        , initialized evenly
+        @m: np.ndarray shape(k, d) - the centroid means for each cluster,
+        initialized with K-means
+        @S: np.ndarray of shpae(k, d, d) - covariance matrices for each
+        cluster, initialized as identity matrices
     """
-    Initializes variables for a Gaussian Mixture Model
 
-    Args:
-        X: numpy.ndarray of shape (n, d) containing the dataset
-        k: positive integer number of clusters
+    if not isinstance(X, np.ndarray) or len(X.shape) != 2:
+        return (None, None, None)
 
-    Returns:
-        pi, m, S: tuple containing priors, centroids, and covariance matrices,
-        or None, None, None on failure
-    """
-    # Input validation
-    if not isinstance(X, np.ndarray) or not isinstance(k, int):
-        return None, None, None
-    if len(X.shape) != 2 or k <= 0:
-        return None, None, None
+    if not isinstance(k, int) or k <= 0:
+        return (None, None, None)
 
-    n, d = X.shape
+    centroids = kmeans(X, k)[0]
 
-    # Initialize priors evenly (1/k for each cluster)
     pi = np.ones(k) / k
 
-    # Initialize centroids using K-means
-    m, _ = kmeans(X, k)
-    if m is None:
-        return None, None, None
+    d = X.shape[1]
+    S = (np.tile(np.identity(d)[None, :], k)).reshape(k, d, d)
 
-    # Initialize covariance matrices as identity matrices
-    S = np.zeros((k, d, d))
-    S[...] = np.eye(d)  # Broadcast identity matrix to all k clusters
-
-    return pi, m, S
+    return pi, centroids, S
