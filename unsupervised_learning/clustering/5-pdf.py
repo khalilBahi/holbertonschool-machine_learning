@@ -9,7 +9,7 @@ def pdf(X, m, S):
     @m: np.ndarray shape(d,) mean of distribution
     @S: np.ndarray shape(d,d) covariance of the distribution
     Return: P or None on failure
-        @P: np.ndarray of shape(n,) the PDF values for each data point
+        @P: np.ndarray of shape(n) the PDF values for each data point
     """
     if not isinstance(X, np.ndarray) or len(X.shape) != 2:
         return None
