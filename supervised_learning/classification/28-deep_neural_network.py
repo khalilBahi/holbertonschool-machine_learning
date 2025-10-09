@@ -209,14 +209,18 @@ class DeepNeuralNetwork:
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
 
+            # Compute next dZ before updating weights (match task 27 order)
+            if i > 1:
+                dA_prev = np.dot(W.T, dZ)
+                dZ_next = dA_prev * self.__hidden_derivative(A_prev)
+
             # Update parameters
             self.__weights[f"W{i}"] -= alpha * dW
             self.__weights[f"b{i}"] -= alpha * db
 
-            # Backpropagate to previous layer
+            # Move to previous layer
             if i > 1:
-                dA_prev = np.dot(W.T, dZ)
-                dZ = dA_prev * self.__hidden_derivative(A_prev)
+                dZ = dZ_next
 
     # -------------------- Training -------------------- #
 
