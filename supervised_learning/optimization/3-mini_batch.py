@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Task 3: 3. Mini-Batch"""
 import numpy as np
-shuffle_data = __import__('2-shuffle_data').shuffle_data
+
+shuffle_data = __import__("2-shuffle_data").shuffle_data
 
 
 def create_mini_batches(X, Y, batch_size):
@@ -14,11 +15,12 @@ def create_mini_batches(X, Y, batch_size):
         batch_size (int): Number of data points in a mini-batch.
 
     Returns:
-        list: A list of mini-batches, where each mini-batch is a tuple (X_batch, Y_batch).
+        list: A list of mini-batches, where each
+        mini-batch is a tuple (X_batch, Y_batch).
     """
     # First shuffle the data
     X_shuffled, Y_shuffled = shuffle_data(X, Y)
-    
+
     m = X_shuffled.shape[0]  # Number of data points
     mini_batches = []
 
