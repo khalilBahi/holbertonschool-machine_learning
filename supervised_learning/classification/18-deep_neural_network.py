@@ -40,9 +40,10 @@ class DeepNeuralNetwork:
             if not isinstance(nodes, int) or nodes < 1:
                 raise TypeError("layers must be a list of positive integers")
 
-            self.__weights[f"W{i + 1}"] = np.random.randn
-            (nodes, prev_nodes) * np.sqrt(
-                2 / prev_nodes
+            # He et al. initialization: split expression to fit style limits
+            self.__weights[f"W{i + 1}"] = (
+                np.random.randn(nodes, prev_nodes)
+                * np.sqrt(2 / prev_nodes)
             )
             self.__weights[f"b{i + 1}"] = np.zeros((nodes, 1))
             prev_nodes = nodes
