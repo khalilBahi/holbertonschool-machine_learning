@@ -15,7 +15,8 @@ class DeepNeuralNetwork:
     __L : int
         The number of layers in the neural network.
     __cache : dict
-        Dictionary holding all intermediary values of the network during forward propagation.
+        Dictionary holding all intermediary values of the network during
+        forward propagation.
     __weights : dict
         Dictionary containing all weights and bias matrices for each layer.
 
@@ -52,12 +53,14 @@ class DeepNeuralNetwork:
         nx : int
             Number of input features.
         layers : list
-            List representing the number of nodes in each layer of the network.
+            List representing the number of nodes in each layer of the
+            network.
 
         Raises
         ------
         TypeError
-            If `nx` is not an integer or `layers` is not a list of positive integers.
+            If `nx` is not an integer or `layers` is not a list of positive
+            integers.
         ValueError
             If `nx` is less than 1 or any layer size is less than 1.
 
@@ -98,7 +101,9 @@ class DeepNeuralNetwork:
 
     @property
     def cache(self):
-        """dict: Stores intermediary values (activations, inputs) during forward propagation."""
+        """dict: Stores intermediary values (activations, inputs) during
+        forward propagation.
+        """
         return self.__cache
 
     @property
@@ -124,7 +129,8 @@ class DeepNeuralNetwork:
         A : ndarray
             Final activation output (predicted probabilities).
         cache : dict
-            Dictionary storing all intermediate activations and linear combinations (Z).
+            Dictionary storing all intermediate activations and linear
+            combinations (Z).
         """
         self.__cache['A0'] = X
         for i in range(1, self.__L + 1):
@@ -153,7 +159,9 @@ class DeepNeuralNetwork:
             The logistic regression cost.
         """
         m = Y.shape[1]
-        cost = -np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A)) / m
+        cost = -np.sum(
+            Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A)
+        ) / m
         return cost
 
     def evaluate(self, X, Y):
@@ -208,7 +216,9 @@ class DeepNeuralNetwork:
             dW = np.dot(dZ, A_prev.T) / m
             db = np.sum(dZ, axis=1, keepdims=True) / m
             if i > 1:
-                dZ = np.dot(W.T, dZ) * A_prev * (1 - A_prev)
+                dZ = (
+                    np.dot(W.T, dZ) * A_prev * (1 - A_prev)
+                )
             self.__weights[f'W{i}'] -= alpha * dW
             self.__weights[f'b{i}'] -= alpha * db
 
@@ -261,7 +271,9 @@ class DeepNeuralNetwork:
             if not isinstance(step, int):
                 raise TypeError("step must be an integer")
             if step <= 0 or step > iterations:
-                raise ValueError("step must be positive and <= iterations")
+                raise ValueError(
+                    "step must be positive and <= iterations"
+                )
 
         costs = []
         steps = []
