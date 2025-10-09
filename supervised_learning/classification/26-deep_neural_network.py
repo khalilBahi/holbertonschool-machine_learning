@@ -32,10 +32,13 @@ class DeepNeuralNetwork:
         Evaluates the network’s predictions and cost.
 
     gradient_descent(Y, cache, alpha=0.05):
-        Performs one pass of backpropagation and updates the weights and biases.
+        Performs one pass of backpropagation
+        and updates the weights and biases.
 
-    train(X, Y, iterations=5000, alpha=0.05, verbose=True, graph=True, step=100):
-        Trains the neural network with gradient descent and optionally displays cost progression.
+    train(X, Y, iterations=5000, alpha=0.05, verbose=True,
+    graph=True, step=100):
+        Trains the neural network with gradient descent and
+        optionally displays cost progression.
 
     save(filename):
         Saves the trained model to disk in `.pkl` format.
