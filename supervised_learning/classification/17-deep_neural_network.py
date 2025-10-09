@@ -1,31 +1,24 @@
 #!/usr/bin/env python3
-""" Task 16: 16. DeepNeuralNetwork"""
+""" Task 16: 16. DeepNeuralNetwork """
 import numpy as np
 
 
 class DeepNeuralNetwork:
     """
-    Defines a deep neural network for binary classification.
-
-    Attributes:
-    - __L (int): Number of layers in the neural network.
-    - __cache (dict): Dictionary to store intermediary
-    values during forward propagation.
-    - __weights (dict): Dictionary to store weights and biases of the network.
+    Defines a deep neural network performing binary classification.
     """
 
     def __init__(self, nx, layers):
         """
-        Class constructor for DeepNeuralNetwork.
+        Constructor for DeepNeuralNetwork.
 
         Parameters:
-        - nx (int): Number of input features.
-        - layers (list): List containing the number of
-        nodes in each layer of the network.
+        - nx: Number of input features.
+        - layers: List representing the number of nodes in each layer.
 
         Raises:
         - TypeError: If nx is not an integer or
-        layers is not a list of positive integers.
+          layers is not a list of positive integers.
         - ValueError: If nx is less than 1.
         """
         if not isinstance(nx, int):
@@ -34,23 +27,24 @@ class DeepNeuralNetwork:
             raise ValueError("nx must be a positive integer")
         if not isinstance(layers, list) or len(layers) == 0:
             raise TypeError("layers must be a list of positive integers")
-        if not all(isinstance(layer, int) and layer > 0 for layer in layers):
-            raise TypeError("layers must be a list of positive integers")
 
+        # initialize private attributes to back the properties
         self.__L = len(layers)
         self.__cache = {}
         self.__weights = {}
 
-        for i in range(1, self.__L + 1):
-            layer_size = layers[i - 1]
-            prev_layer_size = nx if i == 1 else layers[i - 2]
+        # Combine into a single loop
+        prev_nodes = nx
+        for i, nodes in enumerate(layers):
+            # validate each layer inside the single allowed loop
+            if not isinstance(nodes, int) or nodes < 1:
+                raise TypeError("layers must be a list of positive integers")
 
-            # He et al. initialization for weights
-            self.__weights[f"W{i}"] = np.random.randn(
-                layer_size, prev_layer_size
-            ) * np.sqrt(2 / prev_layer_size)
-            # Bias initialization to 0
-            self.__weights[f"b{i}"] = np.zeros((layer_size, 1))
+            self.__weights[f"W{i + 1}"] = (
+                np.random.randn(nodes, prev_nodes) * np.sqrt(2 / prev_nodes)
+            )
+            self.__weights[f"b{i + 1}"] = np.zeros((nodes, 1))
+            prev_nodes = nodes
 
     @property
     def L(self):
