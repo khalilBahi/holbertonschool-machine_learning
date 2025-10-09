@@ -25,22 +25,20 @@ def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
     # Copy the weights dictionary
     weights_copy = weights.copy()
     # Loop through all layers in reverse order
-    for i in range(L, 0, -1):
-        # Retrieve the weights and biases of the current layer
-        W = weights['W' + str(i)]
-        b = weights['b' + str(i)]
-        A = cache['A' + str(i)]
-        A_prev = cache['A' + str(i - 1)]
-        # Calculate the derivative of the activation function
-        if i == L:
-            dZ = A - Y
+    for i in reversed(range(L)):
+        A = cache["A" + str(i + 1)]
+        if i == L - 1:
+            dZ = cache["A" + str(i + 1)] - Y
         else:
-            dZ = np.matmul(weights_copy['W' + str(i + 1)].T, dZ) * (1 - A ** 2)
-        # Calculate the gradient of the weights
-        dW = (1 / m) * np.matmul(dZ, A_prev.T) + (lambtha / m) * W
-        # Calculate the gradient of the biases
-        db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
-        # Update the weights and biases
-        weights_copy['W' + str(i)] = W - alpha * dW
-        weights_copy['b' + str(i)] = b - alpha * db
-    return weights_copy
+            dW2 = np.matmul(weights_copy["W" + str(i + 2)].T, dZ)
+            tanh = 1 - (A * A)
+            dZ = dW2 * tanh
+
+        dW = np.matmul(dZ, cache["A" + str(i)].T) / m
+        dW_L2 = dW + (lambtha / m) * weights_copy["W" + str(i + 1)]
+        db = np.sum(dZ, axis=1, keepdims=True) / m
+
+        weights["W" + str(i + 1)] = (
+            weights_copy["W" + str(i + 1)] - (alpha * dW_L2))
+        weights["b" + str(i + 1)] = (
+            weights_copy["b" + str(i + 1)] - (alpha * db))
