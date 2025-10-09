@@ -237,10 +237,21 @@ class DeepNeuralNetwork:
         Returns:
             tuple: (predictions, final_cost)
         """
-        if not isinstance(iterations, int) or iterations <= 0:
+        # Match task 27 validation semantics exactly
+        if not isinstance(iterations, int):
+            raise TypeError("iterations must be an integer")
+        if iterations <= 0:
             raise ValueError("iterations must be a positive integer")
-        if not isinstance(alpha, float) or alpha <= 0:
-            raise ValueError("alpha must be a positive float")
+        if not isinstance(alpha, float):
+            raise TypeError("alpha must be an float")
+        if alpha <= 0:
+            raise ValueError("alpha must be positive")
+
+        if verbose or graph:
+            if not isinstance(step, int):
+                raise TypeError("step must be an integer")
+            if step <= 0 or step > iterations:
+                raise ValueError("step must be positive and <= iterations")
 
         costs, steps = [], []
 
@@ -260,12 +271,15 @@ class DeepNeuralNetwork:
 
         # Optional graph of cost over time
         if graph:
-            import matplotlib.pyplot as plt
-            plt.plot(steps, costs, 'b')
-            plt.xlabel('Iteration')
-            plt.ylabel('Cost')
-            plt.title('Training Cost Curve')
-            plt.show()
+            try:
+                import matplotlib.pyplot as plt
+                plt.plot(steps, costs, 'b')
+                plt.xlabel('iteration')
+                plt.ylabel('cost')
+                plt.title('Training Cost')
+                plt.show()
+            except Exception:
+                pass
 
         return self.evaluate(X, Y)
 
