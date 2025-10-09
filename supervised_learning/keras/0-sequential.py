@@ -28,7 +28,9 @@ def build_model(nx, layers, activations, lambtha, keep_prob):
         activation=activations[0],
         kernel_regularizer=K.regularizers.l2(lambtha)
     ))
-    model.add(K.layers.Dropout(1 - keep_prob))
+    # Only add dropout if this is not the last layer
+    if len(layers) > 1:
+        model.add(K.layers.Dropout(1 - keep_prob))
 
     # Add the remaining layers
     for i in range(1, len(layers)):
