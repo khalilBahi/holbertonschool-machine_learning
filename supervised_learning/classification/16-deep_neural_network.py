@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" Task 16: 16. DeepNeuralNetwork """
+"""Task 16: DeepNeuralNetwork"""
 import numpy as np
 
 
@@ -13,13 +13,8 @@ class DeepNeuralNetwork:
         Constructor for DeepNeuralNetwork.
 
         Parameters:
-        - nx: Number of input features.
-        - layers: List representing the number of nodes in each layer.
-
-        Raises:
-        - TypeError: If nx is not an integer or
-          layers is not a list of positive integers.
-        - ValueError: If nx is less than 1.
+        - nx: number of input features
+        - layers: list representing the number of nodes in each layer
         """
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
@@ -30,16 +25,28 @@ class DeepNeuralNetwork:
         if not all(isinstance(layer, int) and layer > 0 for layer in layers):
             raise TypeError("layers must be a list of positive integers")
 
-        self.L = len(layers)
-        self.cache = {}
-        self.weights = {}
+        self.__L = len(layers)
+        self.__cache = {}
+        self.__weights = {}
 
-        # Combine into a single loop
         prev_nodes = nx
         for i, nodes in enumerate(layers):
-            self.weights[f"W{i + 1}"
-                         ] = np.random.randn(nodes, prev_nodes) * np.sqrt(
-                2 / prev_nodes
-            )
-            self.weights[f"b{i + 1}"] = np.zeros((nodes, 1))
+            self.__weights[f"W{i + 1}"] = np.random.randn
+            (nodes, prev_nodes) * np.sqrt(2 / prev_nodes)
+            self.__weights[f"b{i + 1}"] = np.zeros((nodes, 1))
             prev_nodes = nodes
+
+    @property
+    def L(self):
+        """Number of layers"""
+        return self.__L
+
+    @property
+    def cache(self):
+        """Dictionary storing intermediate values of the network"""
+        return self.__cache
+
+    @property
+    def weights(self):
+        """Dictionary storing weights and biases of the network"""
+        return self.__weights
