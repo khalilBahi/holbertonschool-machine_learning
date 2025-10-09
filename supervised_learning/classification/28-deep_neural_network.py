@@ -192,7 +192,7 @@ class DeepNeuralNetwork:
         Args:
             Y (numpy.ndarray): True labels (one-hot)
             cache (dict): Cached activations from forward propagation
-            alpha (float): Learning rate
+            alpha (float) Learning rate
         """
         m = Y.shape[1]
         L = self.__L
