@@ -19,14 +19,23 @@ def dropout_gradient_descent(Y, weights, cache, alpha, keep_prob, L):
     L -- number of layers of the network
     """
     m = Y.shape[1]
-    dz = cache["A" + str(L)] - Y
-    for i in range(L, 0, -1):
-        A = cache["A" + str(i - 1)]
-        W = weights["W" + str(i)]
-        dW = (np.matmul(dz, A.T) / m)
-        db = (np.sum(dz, axis=1, keepdims=True) / m)
-        weights["W" + str(i)] = weights["W" + str(i)] - alpha * dW
-        weights["b" + str(i)] = weights["b" + str(i)] - alpha * db
-        if i > 1:
-            dz = np.matmul(W.T, dz) * (A * (1 - A)) * \
-                cache["D" + str(i - 1)] / keep_prob
+    weights_copy = weights.copy()
+
+    for i in reversed(range(L)):
+        A = cache["A" + str(i + 1)]
+        if i == L - 1:
+            dZ = A - Y
+        else:
+            dW2 = np.matmul(weights_copy["W" + str(i + 2)].T, dZ)
+            dtanh = 1 - (A * A)
+            dZ = dW2 * dtanh
+            dZ = dZ * cache["D" + str(i + 1)]
+            dZ = dZ / keep_prob
+
+        dW = np.matmul(dZ, cache["A" + str(i)].T) / m
+        db = np.sum(dZ, axis=1, keepdims=True) / m
+
+        weights["W" + str(i + 1)] = (
+            weights_copy["W" + str(i + 1)] - (alpha * dW))
+        weights["b" + str(i + 1)] = (
+            weights_copy["b" + str(i + 1)] - (alpha * db))
