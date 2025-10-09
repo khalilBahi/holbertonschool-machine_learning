@@ -8,7 +8,8 @@ def normalize(X, m, s):
     Normalize (standardize) a matrix X using the mean and standard deviation.
 
     Args:
-        X (numpy.ndarray): Matrix of shape (d, nx) where d is the number of data points
+        X (numpy.ndarray): Matrix of shape (d, nx)
+        where d is the number of data points
                            and nx is the number of features.
         m (numpy.ndarray): Mean of each feature, shape (nx,).
         s (numpy.ndarray): Standard deviation of each feature, shape (nx,).
