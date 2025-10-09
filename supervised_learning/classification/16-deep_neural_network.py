@@ -31,8 +31,9 @@ class DeepNeuralNetwork:
 
         prev_nodes = nx
         for i, nodes in enumerate(layers):
-            self.__weights[f"W{i + 1}"] = np.random.randn
-            (nodes, prev_nodes) * np.sqrt(2 / prev_nodes)
+            self.__weights[f"W{i + 1}"] = (
+                np.random.randn(nodes, prev_nodes) * np.sqrt(2 / prev_nodes)
+            )
             self.__weights[f"b{i + 1}"] = np.zeros((nodes, 1))
             prev_nodes = nodes
 
@@ -40,6 +41,11 @@ class DeepNeuralNetwork:
     def L(self):
         """Number of layers"""
         return self.__L
+
+    @L.setter
+    def L(self, value):
+        """Allow setting L (used by test scripts that assign to L)."""
+        self.__L = value
 
     @property
     def cache(self):
