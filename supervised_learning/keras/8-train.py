@@ -66,7 +66,7 @@ def train_model(network, data, labels, batch_size, epochs,
         lr_decay_callback = K.callbacks.LearningRateScheduler(
             # Learning rate decay function
             lr_decay_function(alpha, decay_rate),
-            verbose=1  # Print a message when the learning rate is updated
+            verbose=0  # Don't print messages when the learning rate is updated
         )
         callbacks.append(lr_decay_callback)
 
@@ -77,7 +77,7 @@ def train_model(network, data, labels, batch_size, epochs,
             monitor='val_loss',  # Monitor validation loss
             save_best_only=True,  # Save only the best model
             mode='min',  # Save the model with the minimum validation loss
-            verbose=1  # Print a message when the model is saved
+            verbose=0  # Don't print messages when the model is saved
         )
         callbacks.append(checkpoint_callback)
 
