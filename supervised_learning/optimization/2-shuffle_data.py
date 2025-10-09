@@ -8,9 +8,11 @@ def shuffle_data(X, Y):
     Shuffle two matrices X and Y in the same way.
 
     Args:
-        X (numpy.ndarray): Matrix of shape (m, nx) where m is the number of data points
+        X (numpy.ndarray): Matrix of shape (m, nx)
+        where m is the number of data points
                            and nx is the number of features in X.
-        Y (numpy.ndarray): Matrix of shape (m, ny) where m is the same number of data points
+        Y (numpy.ndarray): Matrix of shape (m, ny)
+        where m is the same number of data points
                            as in X and ny is the number of features in Y.
 
     Returns:
