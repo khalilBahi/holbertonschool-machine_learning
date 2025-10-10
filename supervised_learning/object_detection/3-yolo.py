@@ -2,6 +2,7 @@
 """ Task 0: 0. Initialize Yolo """
 import tensorflow.keras as K  # type: ignore
 import numpy as np
+from custom_objects import CUSTOM_OBJECTS
 
 
 class Yolo:
@@ -39,7 +40,9 @@ class Yolo:
             shape (outputs, anchor_boxes, 2).
         """
         # Load the Darknet Keras model
-        self.model = K.models.load_model(model_path, compile=False)
+        self.model = K.models.load_model(
+            model_path, custom_objects=CUSTOM_OBJECTS, compile=False
+        )
 
         # Load the class names
         with open(classes_path, 'r') as file:
@@ -192,50 +195,71 @@ class Yolo:
             tuple: (box_predictions, predicted_box_classes,
             predicted_box_scores)
         """
-        # Initialize lists to store the final results
-        box_predictions = []
-        predicted_box_classes = []
-        predicted_box_scores = []
+        # Handle empty input gracefully
+        if filtered_boxes.size == 0:
+            return (np.empty((0, 4)),
+                    np.empty((0,), dtype=int),
+                    np.empty((0,)))
 
-        # Iterate over each unique class
-        for class_id in np.unique(box_classes):
-            # Get indices of boxes belonging to the current class
-            class_indices = np.where(box_classes == class_id)[0]
+        box_predictions = []  # collected boxes after NMS
+        predicted_box_classes = []  # corresponding class ids
+        predicted_box_scores = []  # corresponding scores
 
-            # Extract boxes, scores, and classes for the current class
-            class_boxes = filtered_boxes[class_indices]
-            class_scores = box_scores[class_indices]
+        # Perform NMS per class
+        for c in np.unique(box_classes):
+            # indices for this class
+            idxs = np.where(box_classes == c)[0]
+            boxes_c = filtered_boxes[idxs]
+            scores_c = box_scores[idxs]
 
-            # Sort boxes by score in descending order
-            sorted_indices = np.argsort(class_scores)[::-1]
-            class_boxes = class_boxes[sorted_indices]
-            class_scores = class_scores[sorted_indices]
+            # sort descending by score
+            order = scores_c.argsort()[::-1]
+            boxes_c = boxes_c[order]
+            scores_c = scores_c[order]
 
-            # Apply NMS
-            keep_indices = []
-            while len(class_boxes) > 0:
-                # Keep the box with the highest score
-                keep_indices.append(sorted_indices[0])
+            while boxes_c.shape[0] > 0:
+                # select top-scoring box
+                box_predictions.append(boxes_c[0])
+                predicted_box_classes.append(c)
+                predicted_box_scores.append(scores_c[0])
 
-                # Compute IoU of the remaining boxes with the highest-scoring
-                # box
-                ious = np.array([self.iou(class_boxes[0], box)
-                                for box in class_boxes[1:]])
-                # Remove boxes with IoU > nms_t
-                remove_indices = np.where(ious > self.nms_t)[0] + 1
-                class_boxes = np.delete(class_boxes, remove_indices, axis=0)
-                class_scores = np.delete(class_scores, remove_indices, axis=0)
-                sorted_indices = np.delete(
-                    sorted_indices, remove_indices, axis=0)
+                if boxes_c.shape[0] == 1:
+                    break  # nothing else to compare
 
-            # Add the kept boxes to the final results
-            box_predictions.extend(filtered_boxes[keep_indices])
-            predicted_box_classes.extend(box_classes[keep_indices])
-            predicted_box_scores.extend(box_scores[keep_indices])
+                # Compute IoU of the top box with the rest (vectorized)
+                xx1 = np.maximum(boxes_c[0, 0], boxes_c[1:, 0])
+                yy1 = np.maximum(boxes_c[0, 1], boxes_c[1:, 1])
+                xx2 = np.minimum(boxes_c[0, 2], boxes_c[1:, 2])
+                yy2 = np.minimum(boxes_c[0, 3], boxes_c[1:, 3])
 
-        # Convert lists to numpy arrays
+                inter_w = np.maximum(0, xx2 - xx1)
+                inter_h = np.maximum(0, yy2 - yy1)
+                inter_area = inter_w * inter_h
+
+                area0 = ((boxes_c[0, 2] - boxes_c[0, 0]) *
+                         (boxes_c[0, 3] - boxes_c[0, 1]))
+                areas = ((boxes_c[1:, 2] - boxes_c[1:, 0]) *
+                         (boxes_c[1:, 3] - boxes_c[1:, 1]))
+                union = area0 + areas - inter_area
+                iou = np.zeros_like(inter_area)
+                valid = union > 0
+                iou[valid] = inter_area[valid] / union[valid]
+
+                # keep boxes with IoU <= threshold
+                keep = np.where(iou <= self.nms_t)[0]
+                boxes_c = boxes_c[keep + 1]
+                scores_c = scores_c[keep + 1]
+
+        # Convert to numpy arrays
         box_predictions = np.array(box_predictions)
         predicted_box_classes = np.array(predicted_box_classes)
         predicted_box_scores = np.array(predicted_box_scores)
 
-        return box_predictions, predicted_box_classes, predicted_box_scores
+        # Order by class then by score (descending) inside each class
+        # Use lexsort with negative scores for descending
+        order = np.lexsort((-predicted_box_scores, predicted_box_classes))
+        box_predictions = box_predictions[order]
+        predicted_box_classes = predicted_box_classes[order]
+        predicted_box_scores = predicted_box_scores[order]
+
+        return (box_predictions, predicted_box_classes, predicted_box_scores)
