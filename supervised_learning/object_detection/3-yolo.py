@@ -2,7 +2,6 @@
 """ Task 0: 0. Initialize Yolo """
 import tensorflow.keras as K  # type: ignore
 import numpy as np
-from custom_objects import CUSTOM_OBJECTS
 
 
 class Yolo:
@@ -40,9 +39,7 @@ class Yolo:
             shape (outputs, anchor_boxes, 2).
         """
         # Load the Darknet Keras model
-        self.model = K.models.load_model(
-            model_path, custom_objects=CUSTOM_OBJECTS, compile=False
-        )
+        self.model = K.models.load_model(model_path, compile=False)
 
         # Load the class names
         with open(classes_path, 'r') as file:
