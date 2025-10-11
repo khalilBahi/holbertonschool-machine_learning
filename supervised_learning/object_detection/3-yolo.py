@@ -71,53 +71,52 @@ class Yolo:
         box_confidences = []
         box_class_probs = []
 
-        for i, output in enumerate(outputs):
-            grid_height, grid_width, anchor_boxes, _ = output.shape
-
-            # Extract box coordinates (t_x, t_y, t_w, t_h)
-            t_x = output[..., 0]
-            t_y = output[..., 1]
-            t_w = output[..., 2]
-            t_h = output[..., 3]
-
-            # Apply sigmoid to t_x and t_y to get box center relative to grid
-            # cell
-            b_x = self.sigmoid(t_x)
-            b_y = self.sigmoid(t_y)
-
-            # Apply exponential to t_w and t_h and scale by anchor box
-            # dimensions
-            b_w = np.exp(t_w) * self.anchors[i, :, 0]
-            b_h = np.exp(t_h) * self.anchors[i, :, 1]
-
-            # Create grid indices
-            grid_x = np.arange(grid_width).reshape(1, grid_width, 1)
-            grid_y = np.arange(grid_height).reshape(grid_height, 1, 1)
-
-            # Calculate absolute box coordinates
-            abs_x = (b_x + grid_x) / grid_width
-            abs_y = (b_y + grid_y) / grid_height
-            abs_w = b_w / self.model.input.shape[1]  # Normalize by input width
-            # Normalize by input height
-            abs_h = b_h / self.model.input.shape[2]
-
-            # Convert to (x1, y1, x2, y2) format
-            x1 = (abs_x - abs_w / 2) * image_size[1]
-            y1 = (abs_y - abs_h / 2) * image_size[0]
-            x2 = (abs_x + abs_w / 2) * image_size[1]
-            y2 = (abs_y + abs_h / 2) * image_size[0]
-
-            # Stack coordinates into a single array
-            box = np.stack([x1, y1, x2, y2], axis=-1)
-            boxes.append(box)
-
-            # Extract box confidence and apply sigmoid
-            box_confidence = self.sigmoid(output[..., 4:5])
-            box_confidences.append(box_confidence)
-
-            # Extract class probabilities and apply sigmoid
-            box_class_prob = self.sigmoid(output[..., 5:])
-            box_class_probs.append(box_class_prob)
+        for i in range(len(outputs)):
+            grid_h = outputs[i].shape[0]
+            grid_w = outputs[i].shape[1]
+            anchor_boxes = outputs[i].shape[2]
+            
+            boxes_i = outputs[i][..., 0:4]
+            
+            for anchor_n in range(anchor_boxes):
+                for cy in range(grid_h):
+                    for cx in range(grid_w):
+                        tx = outputs[i][cy, cx, anchor_n, 0]
+                        ty = outputs[i][cy, cx, anchor_n, 1]
+                        tw = outputs[i][cy, cx, anchor_n, 2]
+                        th = outputs[i][cy, cx, anchor_n, 3]
+                        
+                        pw = self.anchors[i][anchor_n][0]
+                        ph = self.anchors[i][anchor_n][1]
+                        
+                        bx = self.sigmoid(tx) + cx
+                        by = self.sigmoid(ty) + cy
+                        
+                        bw = pw * np.exp(tw)
+                        bh = ph * np.exp(th)
+                        
+                        bx /= grid_w
+                        by /= grid_h
+                        bw /= int(self.model.input.shape[1])
+                        bh /= int(self.model.input.shape[2])
+                        
+                        x1 = (bx - bw / 2) * image_size[1]
+                        y1 = (by - bh / 2) * image_size[0]
+                        x2 = (bx + bw / 2) * image_size[1]
+                        y2 = (by + bh / 2) * image_size[0]
+                        
+                        boxes_i[cy, cx, anchor_n, 0] = x1
+                        boxes_i[cy, cx, anchor_n, 1] = y1
+                        boxes_i[cy, cx, anchor_n, 2] = x2
+                        boxes_i[cy, cx, anchor_n, 3] = y2
+            
+            boxes.append(boxes_i)
+            
+            confidence_i = self.sigmoid(outputs[i][..., 4:5])
+            box_confidences.append(confidence_i)
+            
+            probs_i = self.sigmoid(outputs[i][..., 5:])
+            box_class_probs.append(probs_i)
 
         return boxes, box_confidences, box_class_probs
 
@@ -134,23 +133,26 @@ class Yolo:
         Returns:
             tuple: (filtered_boxes, box_classes, box_scores)
         """
-        # Flatten the lists into single arrays
-        boxes = np.concatenate([box.reshape(-1, 4) for box in boxes])
-        box_confidences = np.concatenate(
-            [confidence.reshape(-1) for confidence in box_confidences])
-        box_class_probs = np.concatenate(
-            [probs.reshape(-1, probs.shape[-1]) for probs in box_class_probs])
-
-        # Calculate the box scores
-        box_scores = box_confidences * np.max(box_class_probs, axis=-1)
-
-        # Filter based on the class threshold
-        mask = box_scores >= self.class_t
-        filtered_boxes = boxes[mask]
-        box_classes = np.argmax(box_class_probs[mask], axis=-1)
-        box_scores = box_scores[mask]
-
-        return filtered_boxes, box_classes, box_scores
+        scores = []
+        
+        for bc, probs in zip(box_confidences, box_class_probs):
+            scores.append(bc * probs)
+        
+        box_classes_list = []
+        box_scores_list = []
+        
+        for score in scores:
+            box_classes_list.append(np.argmax(score, axis=-1).flatten())
+            box_scores_list.append(np.max(score, axis=-1).flatten())
+        
+        boxes = [box.reshape(-1, 4) for box in boxes]
+        boxes = np.concatenate(boxes, axis=0)
+        box_classes = np.concatenate(box_classes_list, axis=0)
+        box_scores = np.concatenate(box_scores_list, axis=0)
+        
+        mask = np.where(box_scores >= self.class_t)
+        
+        return boxes[mask], box_classes[mask], box_scores[mask]
 
     def iou(self, box1, box2):
         """
@@ -192,71 +194,57 @@ class Yolo:
             tuple: (box_predictions, predicted_box_classes,
             predicted_box_scores)
         """
-        # Handle empty input gracefully
-        if filtered_boxes.size == 0:
-            return (np.empty((0, 4)),
-                    np.empty((0,), dtype=int),
-                    np.empty((0,)))
-
-        box_predictions = []  # collected boxes after NMS
-        predicted_box_classes = []  # corresponding class ids
-        predicted_box_scores = []  # corresponding scores
-
-        # Perform NMS per class
-        for c in np.unique(box_classes):
-            # indices for this class
-            idxs = np.where(box_classes == c)[0]
-            boxes_c = filtered_boxes[idxs]
-            scores_c = box_scores[idxs]
-
-            # sort descending by score
-            order = scores_c.argsort()[::-1]
-            boxes_c = boxes_c[order]
-            scores_c = scores_c[order]
-
-            while boxes_c.shape[0] > 0:
-                # select top-scoring box
-                box_predictions.append(boxes_c[0])
-                predicted_box_classes.append(c)
-                predicted_box_scores.append(scores_c[0])
-
-                if boxes_c.shape[0] == 1:
-                    break  # nothing else to compare
-
-                # Compute IoU of the top box with the rest (vectorized)
-                xx1 = np.maximum(boxes_c[0, 0], boxes_c[1:, 0])
-                yy1 = np.maximum(boxes_c[0, 1], boxes_c[1:, 1])
-                xx2 = np.minimum(boxes_c[0, 2], boxes_c[1:, 2])
-                yy2 = np.minimum(boxes_c[0, 3], boxes_c[1:, 3])
-
-                inter_w = np.maximum(0, xx2 - xx1)
-                inter_h = np.maximum(0, yy2 - yy1)
-                inter_area = inter_w * inter_h
-
-                area0 = ((boxes_c[0, 2] - boxes_c[0, 0]) *
-                         (boxes_c[0, 3] - boxes_c[0, 1]))
-                areas = ((boxes_c[1:, 2] - boxes_c[1:, 0]) *
-                         (boxes_c[1:, 3] - boxes_c[1:, 1]))
-                union = area0 + areas - inter_area
-                iou = np.zeros_like(inter_area)
-                valid = union > 0
-                iou[valid] = inter_area[valid] / union[valid]
-
-                # keep boxes with IoU < threshold (suppress if >= threshold)
-                keep = np.where(iou < self.nms_t)[0]
-                boxes_c = boxes_c[keep + 1]
-                scores_c = scores_c[keep + 1]
-
-        # Convert to numpy arrays
-        box_predictions = np.array(box_predictions)
-        predicted_box_classes = np.array(predicted_box_classes)
-        predicted_box_scores = np.array(predicted_box_scores)
-
-        # Order by class then by score (descending) inside each class
-        # Use lexsort with negative scores for descending
-        order = np.lexsort((-predicted_box_scores, predicted_box_classes))
-        box_predictions = box_predictions[order]
-        predicted_box_classes = predicted_box_classes[order]
-        predicted_box_scores = predicted_box_scores[order]
-
-        return (box_predictions, predicted_box_classes, predicted_box_scores)
+        box_predictions = []
+        predicted_box_classes = []
+        predicted_box_scores = []
+        
+        for c in set(box_classes):
+            idx = np.where(box_classes == c)
+            
+            boxes_c = filtered_boxes[idx]
+            scores_c = box_scores[idx]
+            classes_c = box_classes[idx]
+            
+            x1 = boxes_c[:, 0]
+            y1 = boxes_c[:, 1]
+            x2 = boxes_c[:, 2]
+            y2 = boxes_c[:, 3]
+            
+            area = (x2 - x1) * (y2 - y1)
+            sorted_idx = np.flip(scores_c.argsort(), axis=0)
+            
+            keep = []
+            while len(sorted_idx) > 0:
+                i = sorted_idx[0]
+                keep.append(i)
+                
+                if len(sorted_idx) == 1:
+                    break
+                
+                remaining = sorted_idx[1:]
+                
+                xx1 = np.maximum(x1[i], x1[remaining])
+                yy1 = np.maximum(y1[i], y1[remaining])
+                xx2 = np.minimum(x2[i], x2[remaining])
+                yy2 = np.minimum(y2[i], y2[remaining])
+                
+                w = np.maximum(0, xx2 - xx1)
+                h = np.maximum(0, yy2 - yy1)
+                
+                intersection = w * h
+                union = area[i] + area[remaining] - intersection
+                iou = intersection / union
+                
+                below_threshold = np.where(iou <= self.nms_t)[0]
+                sorted_idx = sorted_idx[below_threshold + 1]
+            
+            keep = np.array(keep)
+            box_predictions.append(boxes_c[keep])
+            predicted_box_classes.append(classes_c[keep])
+            predicted_box_scores.append(scores_c[keep])
+        
+        box_predictions = np.concatenate(box_predictions)
+        predicted_box_classes = np.concatenate(predicted_box_classes)
+        predicted_box_scores = np.concatenate(predicted_box_scores)
+        
+        return box_predictions, predicted_box_classes, predicted_box_scores
