@@ -33,8 +33,8 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         return None, None
 
     n, _ = X.shape
-    # Determine effective kmax: default to 10 when None, then cap to n-1
-    eff_kmax = (kmax if kmax is not None else 10)
+    # Determine effective kmax: default to n-1 when None, then cap to n-1
+    eff_kmax = (kmax if kmax is not None else n - 1)
     eff_kmax = min(eff_kmax, n - 1)
 
     # Must analyze at least two different cluster sizes
