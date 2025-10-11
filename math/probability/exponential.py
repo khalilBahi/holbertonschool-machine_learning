@@ -3,6 +3,7 @@
 
 
 class Exponential:
+    """class Exponential"""
     def __init__(self, data=None, lambtha=1.0):
         """
         Initialize an Exponential distribution.
