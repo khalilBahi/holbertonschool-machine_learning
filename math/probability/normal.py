@@ -5,6 +5,7 @@ Normal distribution
 
 
 class Normal:
+    """class Normal"""
     def __init__(self, data=None, mean=0.0, stddev=1.0):
         """
         Initialize a Normal distribution.
