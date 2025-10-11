@@ -42,7 +42,7 @@ class Yolo:
         self.model = K.models.load_model(model_path, compile=False)
 
         # Load the class names
-        with open(classes_path, 'r') as file:
+        with open(classes_path, "r") as file:
             self.class_names = [line.strip() for line in file.readlines()]
 
         # Set the thresholds and anchor boxes
@@ -75,9 +75,9 @@ class Yolo:
             grid_h = outputs[i].shape[0]
             grid_w = outputs[i].shape[1]
             anchor_boxes = outputs[i].shape[2]
-            
+
             boxes_i = outputs[i][..., 0:4]
-            
+
             for anchor_n in range(anchor_boxes):
                 for cy in range(grid_h):
                     for cx in range(grid_w):
@@ -85,36 +85,36 @@ class Yolo:
                         ty = outputs[i][cy, cx, anchor_n, 1]
                         tw = outputs[i][cy, cx, anchor_n, 2]
                         th = outputs[i][cy, cx, anchor_n, 3]
-                        
+
                         pw = self.anchors[i][anchor_n][0]
                         ph = self.anchors[i][anchor_n][1]
-                        
+
                         bx = self.sigmoid(tx) + cx
                         by = self.sigmoid(ty) + cy
-                        
+
                         bw = pw * np.exp(tw)
                         bh = ph * np.exp(th)
-                        
+
                         bx /= grid_w
                         by /= grid_h
                         bw /= int(self.model.input.shape[1])
                         bh /= int(self.model.input.shape[2])
-                        
+
                         x1 = (bx - bw / 2) * image_size[1]
                         y1 = (by - bh / 2) * image_size[0]
                         x2 = (bx + bw / 2) * image_size[1]
                         y2 = (by + bh / 2) * image_size[0]
-                        
+
                         boxes_i[cy, cx, anchor_n, 0] = x1
                         boxes_i[cy, cx, anchor_n, 1] = y1
                         boxes_i[cy, cx, anchor_n, 2] = x2
                         boxes_i[cy, cx, anchor_n, 3] = y2
-            
+
             boxes.append(boxes_i)
-            
+
             confidence_i = self.sigmoid(outputs[i][..., 4:5])
             box_confidences.append(confidence_i)
-            
+
             probs_i = self.sigmoid(outputs[i][..., 5:])
             box_class_probs.append(probs_i)
 
@@ -134,24 +134,24 @@ class Yolo:
             tuple: (filtered_boxes, box_classes, box_scores)
         """
         scores = []
-        
+
         for bc, probs in zip(box_confidences, box_class_probs):
             scores.append(bc * probs)
-        
+
         box_classes_list = []
         box_scores_list = []
-        
+
         for score in scores:
             box_classes_list.append(np.argmax(score, axis=-1).flatten())
             box_scores_list.append(np.max(score, axis=-1).flatten())
-        
+
         boxes = [box.reshape(-1, 4) for box in boxes]
         boxes = np.concatenate(boxes, axis=0)
         box_classes = np.concatenate(box_classes_list, axis=0)
         box_scores = np.concatenate(box_scores_list, axis=0)
-        
+
         mask = np.where(box_scores >= self.class_t)
-        
+
         return boxes[mask], box_classes[mask], box_scores[mask]
 
     def iou(self, box1, box2):
@@ -197,54 +197,54 @@ class Yolo:
         box_predictions = []
         predicted_box_classes = []
         predicted_box_scores = []
-        
+
         for c in set(box_classes):
             idx = np.where(box_classes == c)
-            
+
             boxes_c = filtered_boxes[idx]
             scores_c = box_scores[idx]
             classes_c = box_classes[idx]
-            
+
             x1 = boxes_c[:, 0]
             y1 = boxes_c[:, 1]
             x2 = boxes_c[:, 2]
             y2 = boxes_c[:, 3]
-            
+
             area = (x2 - x1) * (y2 - y1)
             sorted_idx = np.flip(scores_c.argsort(), axis=0)
-            
+
             keep = []
             while len(sorted_idx) > 0:
                 i = sorted_idx[0]
                 keep.append(i)
-                
+
                 if len(sorted_idx) == 1:
                     break
-                
+
                 remaining = sorted_idx[1:]
-                
+
                 xx1 = np.maximum(x1[i], x1[remaining])
                 yy1 = np.maximum(y1[i], y1[remaining])
                 xx2 = np.minimum(x2[i], x2[remaining])
                 yy2 = np.minimum(y2[i], y2[remaining])
-                
+
                 w = np.maximum(0, xx2 - xx1)
                 h = np.maximum(0, yy2 - yy1)
-                
+
                 intersection = w * h
                 union = area[i] + area[remaining] - intersection
                 iou = intersection / union
-                
+
                 below_threshold = np.where(iou <= self.nms_t)[0]
                 sorted_idx = sorted_idx[below_threshold + 1]
-            
+
             keep = np.array(keep)
             box_predictions.append(boxes_c[keep])
             predicted_box_classes.append(classes_c[keep])
             predicted_box_scores.append(scores_c[keep])
-        
+
         box_predictions = np.concatenate(box_predictions)
         predicted_box_classes = np.concatenate(predicted_box_classes)
         predicted_box_scores = np.concatenate(predicted_box_scores)
-        
+
         return box_predictions, predicted_box_classes, predicted_box_scores
