@@ -22,42 +22,40 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         - d_vars is a list containing the difference in variance from the
         smallest cluster size for each cluster size.
     """
-    # Basic validation
-    if not isinstance(X, np.ndarray) or X.ndim != 2:
+    # Validation matching reference implementation
+    if type(X) is not np.ndarray or len(X.shape) != 2:
         return None, None
-    if not isinstance(kmin, int) or kmin <= 0:
+    if type(iterations) is not int or iterations <= 0:
         return None, None
-    if kmax is not None and not isinstance(kmax, int):
+    if type(kmin) is not int or kmin < 1:
         return None, None
-    if not isinstance(iterations, int) or iterations <= 0:
+    if kmax is not None and (type(kmax) is not int or kmax < 1):
+        return None, None
+    if kmax is not None and kmin >= kmax:
         return None, None
 
-    n, _ = X.shape
-    # Determine effective kmax: default to n-1 when None, then cap to n-1
-    eff_kmax = (kmax if kmax is not None else n - 1)
-    eff_kmax = min(eff_kmax, n - 1)
-
-    # Must analyze at least two different cluster sizes
-    if eff_kmax < kmin + 1:
-        return None, None
+    n, d = X.shape
+    if kmax is None:
+        kmax = n
 
     results = []
     d_vars = []
-    base_variance = None
-
-    # Single loop over cluster sizes [kmin, eff_kmax]
-    for k in range(kmin, eff_kmax + 1):
+    
+    # Loop over cluster sizes [kmin, kmax] inclusive
+    for k in range(kmin, kmax + 1):
         C, clss = kmeans(X, k, iterations)
+        # Guard against None returns to prevent TypeError
         if C is None or clss is None:
             return None, None
         results.append((C, clss))
-        var_k = variance(X, C)
-        if var_k is None:
+        
+        var = variance(X, C)
+        # Guard against None variance
+        if var is None:
             return None, None
-        if base_variance is None:
-            base_variance = var_k
-            d_vars.append(0.0)
-        else:
-            d_vars.append(base_variance - var_k)
+            
+        if k == kmin:
+            first_var = var
+        d_vars.append(first_var - var)
 
     return results, d_vars
