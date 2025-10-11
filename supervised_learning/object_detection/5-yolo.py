@@ -256,6 +256,7 @@ class Yolo:
         # creating a correct full path argument
         images = []
         image_paths = glob.glob(folder_path + '/*', recursive=False)
+        image_paths = sorted(image_paths)  # Sort paths alphabetically
 
         # creating the images list
         for imagepath_i in image_paths:
