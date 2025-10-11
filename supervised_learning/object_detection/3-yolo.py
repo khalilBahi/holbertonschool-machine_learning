@@ -242,8 +242,8 @@ class Yolo:
                 valid = union > 0
                 iou[valid] = inter_area[valid] / union[valid]
 
-                # keep boxes with IoU <= threshold
-                keep = np.where(iou <= self.nms_t)[0]
+                # keep boxes with IoU < threshold (suppress if >= threshold)
+                keep = np.where(iou < self.nms_t)[0]
                 boxes_c = boxes_c[keep + 1]
                 scores_c = scores_c[keep + 1]
 
