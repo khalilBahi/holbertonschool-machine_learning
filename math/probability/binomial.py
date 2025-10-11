@@ -6,6 +6,7 @@ import math
 
 
 class Binomial:
+    """class Binomial"""
     def __init__(self, data=None, n=1, p=0.5):
         """
         Initializes the Binomial distribution parameters.
