@@ -22,41 +22,42 @@ def optimum_k(X, kmin=1, kmax=None, iterations=1000):
         - d_vars is a list containing the difference in variance from the
         smallest cluster size for each cluster size.
     """
+    # Basic validation
     if not isinstance(X, np.ndarray) or X.ndim != 2:
         return None, None
     if not isinstance(kmin, int) or kmin <= 0:
         return None, None
-    if kmax is not None and (not isinstance(kmax, int) or kmax < kmin):
+    if kmax is not None and not isinstance(kmax, int):
         return None, None
     if not isinstance(iterations, int) or iterations <= 0:
         return None, None
-    if isinstance(kmax, int) and kmax <= kmin:
-        return None, None
 
-    if kmax is None:
-        max_clusters = X.shape[0]
-    else:
-        max_clusters = kmax
+    n, d = X.shape
+    # Determine effective kmax and cap to n-1 to satisfy variance constraints
+    eff_kmax = (kmax if kmax is not None else n - 1)
+    eff_kmax = min(eff_kmax, n - 1)
+
+    # Must analyze at least two different cluster sizes
+    if eff_kmax < kmin + 1:
+        return None, None
 
     results = []
     d_vars = []
+    base_variance = None
 
-    # Calculations with kmin (smallest cluster size)
-    C, clss = kmeans(X, kmin, iterations)
-    base_variance = variance(X, C)
-    results.append((C, clss))
-    # Base difference with first variance (with itself) is zero
-    d_vars = [0.0]
-
-    # With each following cluster size k:
-    k = kmin + 1
-    while k < max_clusters + 1:
-        # Run kmeans algorithm and calc. variance of distance to centroids
+    # Single loop over cluster sizes [kmin, eff_kmax]
+    for k in range(kmin, eff_kmax + 1):
         C, clss = kmeans(X, k, iterations)
-        current_variance = variance(X, C)
-        # Add results and variances differences to the lists
+        if C is None or clss is None:
+            return None, None
         results.append((C, clss))
-        d_vars.append(base_variance - current_variance)
-        k += 1
+        var_k = variance(X, C)
+        if var_k is None:
+            return None, None
+        if base_variance is None:
+            base_variance = var_k
+            d_vars.append(0.0)
+        else:
+            d_vars.append(base_variance - var_k)
 
     return results, d_vars
