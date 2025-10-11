@@ -256,7 +256,6 @@ class Yolo:
         # creating a correct full path argument
         images = []
         image_paths = glob.glob(folder_path + '/*', recursive=False)
-        image_paths = sorted(image_paths)  # Sort paths alphabetically
 
         # creating the images list
         for imagepath_i in image_paths:
@@ -274,30 +273,25 @@ class Yolo:
         Returns:
             tuple: (pimages, image_shapes)
         """
-        # Get the input dimensions of the Darknet model
+        dims = []
+        res_images = []
+
         input_h = self.model.input.shape[1]
         input_w = self.model.input.shape[2]
 
-        # Initialize lists to store preprocessed images and original shapes
-        pimages = []
-        image_shapes = []
-
         for image in images:
-            # Store the original shape
-            image_shapes.append(image.shape[:2])
+            dims.append(image.shape[:2])
 
-            # Resize the image using inter-cubic interpolation
-            resized_image = cv2.resize(
-                image, (input_w, input_h), interpolation=cv2.INTER_CUBIC)
+        dims = np.stack(dims, axis=0)
 
-            # Rescale pixel values to [0, 1]
-            resized_image = resized_image / 255.0
+        newtam = (input_h, input_w)
 
-            # Add the preprocessed image to the list
-            pimages.append(resized_image)
+        interpolation = cv2.INTER_CUBIC
+        for image in images:
+            resize_img = cv2.resize(image, newtam, interpolation=interpolation)
+            resize_img = resize_img / 255
+            res_images.append(resize_img)
 
-        # Convert lists to numpy arrays
-        pimages = np.array(pimages)
-        image_shapes = np.array(image_shapes)
+        res_images = np.stack(res_images, axis=0)
 
-        return pimages, image_shapes
+        return (res_images, dims)
