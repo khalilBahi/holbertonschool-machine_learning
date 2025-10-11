@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 """ Exponential distribution """
 
+
 class Exponential:
-    def __init__(self, data=None, lambtha=1.):
+    def __init__(self, data=None, lambtha=1.0):
         """
         Initialize an Exponential distribution.
 
         Parameters:
         - data (list, optional): List of data to estimate the distribution.
-        - lambtha (float, optional): Expected number of occurrences in a given time frame.
+        - lambtha (float, optional): Expected number
+        of occurrences in a given time frame.
 
         Sets the instance attribute:
         - lambtha (float): The rate parameter of the Exponential distribution.
 
         Raises:
-        - ValueError: If lambtha is not positive or if data does not contain multiple values.
+        - ValueError: If lambtha is not positive or if
+        data does not contain multiple values.
         - TypeError: If data is not a list.
         """
         # Case 1: If data is not given (i.e., data is None)
@@ -38,7 +41,8 @@ class Exponential:
 
     def pdf(self, x):
         """
-        Calculate the Probability Density Function (PDF) for a given time period.
+        Calculate the Probability Density Function
+        (PDF) for a given time period.
 
         Parameters:
         - x (float): Time period.
@@ -49,37 +53,39 @@ class Exponential:
         Notes:
         - If x is out of range (e.g., negative), returns 0.
         """
-        # If x is negative, return 0 (out of range for Exponential distribution)
+        # If x is negative, return 0
         if x < 0:
             return 0
-        
+
         # Define e (base of natural logarithm)
         e = 2.7182818285
-        
+
         # Calculate the PDF: f(x) = λ * e^(-λx)
         # where λ is self.lambtha
         return self.lambtha * (e ** (-self.lambtha * x))
 
     def cdf(self, x):
         """
-        Calculate the Cumulative Distribution Function (CDF) for a given time period.
+        Calculate the Cumulative Distribution
+        Function (CDF) for a given time period.
 
         Parameters:
         - x (float): Time period.
 
         Returns:
-        - float: The CDF value for x (probability of time being less than or equal to x).
+        - float: The CDF value for x
+        (probability of time being less than or equal to x).
 
         Notes:
         - If x is out of range (e.g., negative), returns 0.
         """
-        # If x is negative, return 0 (out of range for Exponential distribution)
+        # If x is negative, return 0
         if x < 0:
             return 0
-        
+
         # Define e (base of natural logarithm)
         e = 2.7182818285
-        
+
         # Calculate the CDF: F(x) = 1 - e^(-λx)
         # where λ is self.lambtha
         return 1 - (e ** (-self.lambtha * x))
