@@ -81,18 +81,14 @@ def minor(matrix):
 
     n = len(matrix)
 
-    # Handle 1x1 (and degenerate [ [] ] case) explicitly
-    if n == 1:
-        if len(matrix[0]) == 0:
-            return [[1]]
-        if len(matrix[0]) != 1:
-            raise ValueError("matrix must be a non-empty square matrix")
-        return [[1]]
-
-    # Validate square shape for n > 1
+    # Validate square shape and non-emptiness
     for row in matrix:
         if len(row) != n:
             raise ValueError("matrix must be a non-empty square matrix")
+
+    # Handle 1x1 case explicitly
+    if n == 1:
+        return [[1]]
 
     # Build the minor matrix
     minors = []
